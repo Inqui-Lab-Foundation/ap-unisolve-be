@@ -8,14 +8,14 @@ import { reflective_quiz_response } from "../models/reflective_quiz_response.mod
 import BaseService from "./base.service";
 import CRUDService from "./crud.service";
 
-export default class ReflectiveQuizService extends BaseService{
-    
-    public async fetchNextQuestion(user_id:number,video_id:any,paramStatus:any){
-        try{
-            if(!video_id){
+export default class ReflectiveQuizService extends BaseService {
+
+    public async fetchNextQuestion(user_id: number, video_id: any, paramStatus: any) {
+        try {
+            if (!video_id) {
                 throw badRequest(speeches.QUIZ_ID_REQUIRED);
             }
-            if(!user_id){
+            if (!user_id) {
                 throw unauthorized(speeches.UNAUTHORIZED_ACCESS);
             }
             //check if the given quiz is a valid topic
@@ -23,35 +23,42 @@ export default class ReflectiveQuizService extends BaseService{
             // if(!curr_topic || curr_topic instanceof Error){
             //     throw badRequest("INVALID TOPIC");
             // }
-    
-            const quizRes = await this.crudService.findOne(reflective_quiz_response,{where: {video_id:video_id,user_id:user_id}});
-            if(quizRes instanceof Error){
+
+            const quizRes = await this.crudService.findOne(reflective_quiz_response, { where: { video_id: video_id, user_id: user_id } });
+            if (quizRes instanceof Error) {
                 throw internal(quizRes.message)
             }
-            let whereClauseStatusPart:any = {}
-            let boolStatusWhereClauseRequired = false
-            if(paramStatus && (paramStatus in constents.common_status_flags.list)){
-                whereClauseStatusPart = {"status":paramStatus}
+            let whereClauseStatusPart: any = {}
+            let boolStatusWhereClauseRequired = false;
+            if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    boolStatusWhereClauseRequired = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    boolStatusWhereClauseRequired = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
                 boolStatusWhereClauseRequired = true;
             }
-    
             let level = "HARD"
             let question_no = 1
-            let nextQuestion:any=null;
+            let nextQuestion: any = null;
             // console.log(quizRes)
-            if(quizRes){
+            if (quizRes) {
                 //TOOO :: implement checking response and based on that change the 
-                let user_response:any = {}
-                user_response =  JSON.parse(quizRes.dataValues.response);
+                let user_response: any = {}
+                user_response = JSON.parse(quizRes.dataValues.response);
                 // console.log(user_response);
                 let questionNosAsweredArray = Object.keys(user_response);
-                questionNosAsweredArray = questionNosAsweredArray.sort((a,b) => (Number(a) > Number(b) ? -1 : 1));
+                questionNosAsweredArray = questionNosAsweredArray.sort((a, b) => (Number(a) > Number(b) ? -1 : 1));
                 const noOfQuestionsAnswered = Object.keys(user_response).length
                 // console.log(noOfQuestionsAnswered)
                 const lastQuestionAnsewered = user_response[questionNosAsweredArray[0]]//we have assumed that this length will always have atleast 1 item ; this could potentially be a source of bug, but is not since this should always be true based on above checks ..
                 // if(lastQuestionAnsewered.selected_option == lastQuestionAnsewered.correct_answer){
-                    question_no = lastQuestionAnsewered.question_no+1;
-                    level = "HARD";
+                question_no = lastQuestionAnsewered.question_no + 1;
+                level = "HARD";
                 // }else{
                 //     question_no = lastQuestionAnsewered.question_no;
                 //     if(lastQuestionAnsewered.level == "HARD"){
@@ -64,25 +71,25 @@ export default class ReflectiveQuizService extends BaseService{
                 //     }
                 // }
             }
-            
-            const nextQuestionsToChooseFrom = await this.crudService.findOne(reflective_quiz_question,{where:{
-                [Op.and]:[
-                    whereClauseStatusPart,
-                    {video_id:video_id},
-                    {level:level},
-                    {question_no:question_no},
-                ]
-                
-            }})
-            
-            if(nextQuestionsToChooseFrom instanceof Error){
+            const nextQuestionsToChooseFrom = await this.crudService.findOne(reflective_quiz_question, {
+                where: {
+                    [Op.and]: [
+                        { video_id: video_id },
+                        { level: level },
+                        { question_no: question_no },
+                        whereClauseStatusPart,
+                    ]
+
+                }
+            })
+            if (nextQuestionsToChooseFrom instanceof Error) {
                 throw internal(nextQuestionsToChooseFrom.message)
             }
             return nextQuestionsToChooseFrom
-        }catch(error){
+        } catch (error) {
             return error;
         }
-    }   
+    }
 }
 
 

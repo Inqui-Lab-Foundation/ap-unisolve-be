@@ -47,9 +47,19 @@ export default class VideoController extends BaseController {
                 next(error)
             });
             const where: any = {};
-            let whereClauseStatusPart:any = {};
-            if(paramStatus && (paramStatus in constents.common_status_flags.list)){
-                whereClauseStatusPart = {"status":paramStatus}
+            let whereClauseStatusPart: any = {}
+            let boolStatusWhereClauseRequired = false;
+            if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    boolStatusWhereClauseRequired = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    boolStatusWhereClauseRequired = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
+                boolStatusWhereClauseRequired = true;
             }
             if (id) {
                 where[`${this.model}_id`] = req.params.id;

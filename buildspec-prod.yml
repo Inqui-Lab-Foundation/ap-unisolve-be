@@ -10,8 +10,9 @@ phases:
       - npm install
   build:
      commands:
-      - aws s3 cp s3://codepipeline-ap-south-1-203395984745/configs/prod/.env .
+      - aws s3 cp s3://cicd-build-deployment-ts-artefacts/prod/.env .
       - cat .env
+      - chmod +x ./scripts/*.sh
       - echo npm run build
       - npm run build
   post_build:

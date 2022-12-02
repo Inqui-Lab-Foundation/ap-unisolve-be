@@ -24,5 +24,6 @@ export const up: Migration = async ({ context: sequelize }) => {
 export const down: Migration = async ({ context: sequelize }) => {
 	// 	await sequelize.query(`raise fail('down migration not implemented')`); //call direct sql 
 	//or below implementation 
-	await sequelize.getQueryInterface().dropTable(tableName);
+	// await sequelize.getQueryInterface().dropTable(tableName);
+	throw Error("not yet implemented")
 };

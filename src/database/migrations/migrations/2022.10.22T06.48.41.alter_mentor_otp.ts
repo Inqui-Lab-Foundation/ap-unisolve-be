@@ -12,5 +12,5 @@ export const up: Migration = async ({ context: sequelize }) => {
 };
 
 export const down: Migration = async ({ context: sequelize }) => {
-	await sequelize.getQueryInterface().dropTable(tableName);
+	await sequelize.getQueryInterface().removeColumn(tableName,'otp');
 };

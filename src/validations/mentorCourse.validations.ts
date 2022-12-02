@@ -3,10 +3,10 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const mentorCourseSchema = Joi.object().keys({
-    title: Joi.string().required().messages({
+    title: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.NAME_REQUIRED
     }),
-    description: Joi.string().required().messages({
+    description: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.DESCRIPTION_REQUIRED
     }),
     thumbnail: Joi.string().allow(null),

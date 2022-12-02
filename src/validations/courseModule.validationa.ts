@@ -6,7 +6,7 @@ export const courseModuleSchema = Joi.object().keys({
     course_id: Joi.string().required().messages({
         'string.empty': speeches.ID_REQUIRED
     }),
-    title: Joi.string().required().messages({
+    title: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.DESCRIPTION_REQUIRED
     })
 });

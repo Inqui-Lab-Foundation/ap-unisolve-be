@@ -72,6 +72,7 @@ export default class ReflectiveQuizController extends BaseController {
                 resultQuestion["options"] = optionsArr;
                 resultQuestion["level"] = nextQuestionsToChooseFrom.dataValues.level;
                 resultQuestion["type"] = nextQuestionsToChooseFrom.dataValues.type;
+                resultQuestion["status"] = nextQuestionsToChooseFrom.dataValues.status;
 
                 res.status(200).send(dispatcher(res,resultQuestion))
             }else{

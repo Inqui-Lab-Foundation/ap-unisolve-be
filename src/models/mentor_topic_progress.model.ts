@@ -5,7 +5,8 @@ import db from '../utils/dbconnection.util';
 import { course_topic } from './course_topic.model';
 import { user } from './user.model';
 import { constents } from '../configs/constents.config';
-import {mentor_course_topic} from "../models/mentor_course_topic.model";
+import { mentor_course_topic } from "../models/mentor_course_topic.model";
+import { mentor } from './mentor.model';
 
 export class mentor_topic_progress extends Model<InferAttributes<mentor_topic_progress>, InferCreationAttributes<mentor_topic_progress>> {
     declare mentor_topic_progress_id: CreationOptional<number>;
@@ -82,6 +83,8 @@ mentor_topic_progress.init(
 
 //TODO:call associate method is any association is defined
 mentor_topic_progress.belongsTo(mentor_course_topic, { foreignKey: 'mentor_course_topic_id' })
+mentor_course_topic.hasMany(mentor_topic_progress, { foreignKey: 'user_id', as: 'progress' })
 mentor_topic_progress.belongsTo(user, { foreignKey: 'user_id' })
 user.hasMany(mentor_topic_progress, { foreignKey: 'user_id' })
-mentor_course_topic.hasMany(mentor_topic_progress, { foreignKey: 'user_id', as: 'progress' })
+mentor_topic_progress.belongsTo(mentor, { targetKey: 'user_id', foreignKey: 'user_id' })
+mentor.hasMany(mentor_topic_progress, { sourceKey: 'user_id', foreignKey: 'user_id' })

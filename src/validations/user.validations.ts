@@ -3,10 +3,10 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const userSchema = Joi.object().keys({
-    username: Joi.string().required().messages({
+    username: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_USERNAME_REQUIRED
     }),
-    full_name: Joi.string().required().messages({
+    full_name: Joi.string().trim().min(1).regex(constents.ALPHA_NUMERIC_PATTERN).required().messages({
         'string.empty': speeches.USER_FULLNAME_REQUIRED
     }),
     role: Joi.string().required().messages({
@@ -21,7 +21,7 @@ export const userSchema = Joi.object().keys({
 });
 export const userUpdateSchema = Joi.object().keys({
     status: Joi.string().valid(...Object.values(constents.common_status_flags.list)),
-    full_name: Joi.string(),
+    full_name: Joi.string().trim().min(1).regex(constents.ALPHA_NUMERIC_PATTERN),
     Age: Joi.string(),
     Grade: Joi.string(),
     team_id: Joi.string(),
@@ -34,7 +34,7 @@ export const UpdateMentorUsernameSchema = Joi.object().keys({
     mobile: Joi.string().required().messages({
         'string.empty': speeches.MOBILE_NUMBER_REQUIRED
     }),
-    username: Joi.string().required().messages({
+    username: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_EMAIL_REQUIRED
     })
 });

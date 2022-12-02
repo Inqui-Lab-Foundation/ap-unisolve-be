@@ -47,7 +47,31 @@ export default class StudentService extends BaseService{
                             )`),
                         "topics_completed_count"
                     ],
-                ]    
+                    [
+                        db.literal(`(
+                            ${serviceDashboard.getDbLieralForPreSurveyStatus(addWhereClauseStatusPart,
+                            whereClauseStatusPartLiteral)}
+                            )`),
+                        "pre_survey_status"
+                    ],
+                    [
+                        db.literal(`(
+                            ${serviceDashboard.getDbLieralForPostSurveyStatus(addWhereClauseStatusPart,
+                            whereClauseStatusPartLiteral)}
+                            )`),
+                        "post_survey_status"
+                    ],
+                    [
+                        db.literal(`(
+                            ${serviceDashboard.getDbLieralIdeaSubmission(addWhereClauseStatusPart,
+                            whereClauseStatusPartLiteral)}
+                            )`),
+                        "idea_submission"
+                    ],
+                    // [
+                    //     { "certificate_status": 0 } // hardcoded for now, functionality yet to finalized
+                    // ]
+                ]
             }
             let whereClauseShowCurrUserPart = {}
             if(!showCurrUserAsWell){

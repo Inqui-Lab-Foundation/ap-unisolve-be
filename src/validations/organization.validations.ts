@@ -3,23 +3,22 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const organizationSchema = Joi.object().keys({
-    details: Joi.string().required().messages({
+    details: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.ID_REQUIRED
     }),
     organization_code: Joi.string().required().messages({
         'string.empty': speeches.ID_REQUIRED
     }),
-    organization_name: Joi.string().required().messages({
+    organization_name: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.ID_REQUIRED
     }),
-
 });
 
 export const organizationRawSchema = Joi.object().keys({
-    organization_code: Joi.string().required().messages({
+    organization_code: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.ORG_CODE_REQUIRED
     }),
-    organization_name: Joi.string().required().messages({
+    organization_name: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.ORG_NAME_REQUIRED
     }),
     principal_name: Joi.string().messages({

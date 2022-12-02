@@ -34,7 +34,8 @@ export const constents = {
       'ACTIVE': 'ACTIVE',
       'INACTIVE': 'INACTIVE',
       'DELETED': 'DELETED',
-      'LOCKED': 'LOCKED'
+      'LOCKED': 'LOCKED',
+      'ALL': 'ALL'
     },
     default: 'ACTIVE'
   },
@@ -174,6 +175,40 @@ export const constents = {
   translations_flags:{
     default_locale: "en"
   },
-  default_image_path: "/images/default.jpg"
-
+  default_image_path: "/images/default.jpg",
+  reports_all_ment_reports_rs_flags: {
+    list: {
+      "ALL": "ALL",
+      "COMPLETED": "COMPLETED",
+      "INCOMPLETE": "INCOMPLETE",
+      "INPROGRESS": "INPROGRESS",
+    },
+    default: "ALL"
+  },
+  TEAMS_MAX_STUDENTS_ALLOWED: 5,
+  ALPHA_NUMERIC_PATTERN : /^[a-zA-Z0-9 ]*$/,
+  TRANSLATION_CONFIG:{
+    table_column : {
+      "quiz_questions" : {
+        "primary_key" : "quiz_question_id",
+        "columns" : [
+        'question',
+        'option_a',
+        'option_b',
+        'option_c',
+        'option_d',
+        'correct_ans',
+        'question_image',
+        'question_icon',
+        'msg_ans_correct',
+        'msg_ans_wrong',
+        'ar_image_ans_correct',
+        'ar_video_ans_correct',
+        'accimg_ans_correct',
+        'ar_image_ans_wrong',
+        'ar_video_ans_wrong',
+        'accimg_ans_wrong',
+      ]}
+    }
+  }
 };

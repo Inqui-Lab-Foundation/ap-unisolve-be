@@ -85,15 +85,26 @@ export default class CRUDController implements IController {
             };
             // pagination
             const { page, size, status } = req.query;
-            let condition = status ? { status: { [Op.like]: `%${status}%` } } : null;
+            // let condition = status ? { status: { [Op.like]: `%${status}%` } } : null;
             const { limit, offset } = this.getPagination(page, size);
             const modelClass = await this.loadModel(model).catch(error => {
                 next(error)
             });
             const where: any = {};
             let whereClauseStatusPart: any = {};
+            let whereClauseStatusPartLiteral = "1=1";
+            let addWhereClauseStatusPart = false
             if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
-                whereClauseStatusPart = { "status": paramStatus }
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    addWhereClauseStatusPart = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    addWhereClauseStatusPart = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
+                addWhereClauseStatusPart = true;
             }
             if (id) {
                 where[`${this.model}_id`] = req.params.id;
@@ -111,7 +122,7 @@ export default class CRUDController implements IController {
                         where: {
                             [Op.and]: [
                                 whereClauseStatusPart,
-                                condition
+                                // condition
                             ]
                         }, limit, offset
                     })

@@ -51,18 +51,23 @@ export default class MentorCourseController extends BaseController {
             const modelClass = await this.loadModel(this.model)
             
             
-            const where: any = {};
-           
-            let whereClauseStatusPart:any = {};
+            const where: any = {}; 
+            let whereClauseStatusPart: any = {};
             let whereClauseStatusPartLiteral = "1=1";
             let addWhereClauseStatusPart = false
-            if(paramStatus && (paramStatus in constents.common_status_flags.list)){
-                whereClauseStatusPart = {"status":paramStatus}
-                whereClauseStatusPartLiteral = `status = "${paramStatus}"`
-                addWhereClauseStatusPart =true;
+            if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    addWhereClauseStatusPart = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    addWhereClauseStatusPart = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
+                addWhereClauseStatusPart = true;
             }
 
-            
             if (id) {
                 // where[`${this.model}_id`] = req.params.id;
                 data = await this.getDetailsData(req, res, modelClass)

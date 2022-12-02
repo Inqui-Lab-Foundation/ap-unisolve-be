@@ -14,8 +14,7 @@ export const translationSchema = Joi.object().keys({
     }),
     value: Joi.string().required().messages({
         'string.empty': speeches.ID_REQUIRED
-    }),
-    
+    })
 });
 
 export const translationUpdateSchema = Joi.object().keys({
@@ -23,4 +22,16 @@ export const translationUpdateSchema = Joi.object().keys({
         'any.only': speeches.COMMON_STATUS_INVALID,
         'string.empty': speeches.COMMON_STATUS_REQUIRED
     }),
+    from_locale: Joi.string().messages({
+        'string.empty': speeches.ID_REQUIRED
+    }),
+    to_locale: Joi.string().messages({
+        'string.empty': speeches.ID_REQUIRED
+    }),
+    key: Joi.string().required().messages({
+        'string.empty': speeches.ID_REQUIRED
+    }),
+    value: Joi.string().required().messages({
+        'string.empty': speeches.ID_REQUIRED
+    })
 });

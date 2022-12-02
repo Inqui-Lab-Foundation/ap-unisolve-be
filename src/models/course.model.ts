@@ -16,6 +16,7 @@ export interface courseAttributes {
 }
 
 export class course extends Model<courseAttributes> {
+    static modelTableName = "courses";
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -78,7 +79,7 @@ course.init(
     },
     {
         sequelize: db,
-        tableName: 'courses',
+        tableName: course.modelTableName,
         timestamps: true,
         updatedAt: 'updated_at',
         createdAt: 'created_at',

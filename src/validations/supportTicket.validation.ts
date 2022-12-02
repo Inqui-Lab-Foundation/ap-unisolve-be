@@ -3,10 +3,10 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const supportTickets = Joi.object().keys({
-    query_category: Joi.string().required().messages({
+    query_category: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.QUERY_CATEGORY
     }),
-    query_details: Joi.string().required().messages({
+    query_details: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.QUERY_DETAILS
     })
 });

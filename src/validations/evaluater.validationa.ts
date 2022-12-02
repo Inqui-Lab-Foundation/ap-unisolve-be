@@ -3,22 +3,22 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const evaluaterSchema = Joi.object().keys({
-    username: Joi.string().required().messages({
+    username: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_USERNAME_REQUIRED
     }),
-    full_name: Joi.string().required().messages({
+    full_name: Joi.string().trim().min(1).regex(constents.ALPHA_NUMERIC_PATTERN).required().messages({
         'string.empty': speeches.USER_FULLNAME_REQUIRED
     }),
     role: Joi.string().required().messages({
         'string.empty': speeches.USER_ROLE_REQUIRED
     }),
-    team_id: Joi.string().required().messages({
+    team_id: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_TEAMID_REQUIRED
     }),
-    organization_code: Joi.string().required().messages({
+    organization_code: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_ORGANIZATION_CODE_REQUIRED
     }),
-    qualification: Joi.string().required().messages({
+    qualification: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_QUALIFICATION_REQUIRED
     })
 });
@@ -38,7 +38,7 @@ export const evaluaterChangePasswordSchema = Joi.object().keys({
     old_password: Joi.string().required().messages({
         'string.empty': speeches.USER_OLDPASSWORD_REQUIRED
     }),
-    new_password: Joi.string().required().messages({
+    new_password: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.USER_NEWPASSWORD_REQUIRED
     })
 });

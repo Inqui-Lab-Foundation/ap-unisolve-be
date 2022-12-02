@@ -55,7 +55,7 @@ export default class QuizController extends BaseController {
                 throw unauthorized(speeches.UNAUTHORIZED_ACCESS);
             }
             //check if the given quiz is a valid topic
-            const curr_topic = await this.crudService.findOne(course_topic, { where: { "topic_type_id": quiz_id, "topic_type": "QUIZ" } })
+            const curr_topic = await this.crudService.findOne(course_topic, { where: { "topic_type_id": quiz_id, "topic_type": "QUIZ", status: 'ACTIVE' } })
             if (!curr_topic || curr_topic instanceof Error) {
 
                 //here we have made a mjor assumption that mentor quiz_id and student quiz ids will be diff and that one quiz_id cannot be added in both student and mentor course_topic tables(these are two diff tables) , if u do so it will be considered as student course api
@@ -72,12 +72,19 @@ export default class QuizController extends BaseController {
                 throw internal(quizRes.message)
             }
             let whereClauseStatusPart: any = {}
-            let boolStatusWhereClauseRequired = false
+            let boolStatusWhereClauseRequired = false;
             if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
-                whereClauseStatusPart = { "status": paramStatus }
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    boolStatusWhereClauseRequired = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    boolStatusWhereClauseRequired = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
                 boolStatusWhereClauseRequired = true;
             }
-    
             let level = "HARD"
             let question_no = 1
             let nextQuestion: any = null;
@@ -184,7 +191,11 @@ export default class QuizController extends BaseController {
         try {
 
             const quiz_id = req.params.id;
-            const { quiz_question_id, selected_option } = req.body;
+
+            const { quiz_question_id  } = req.body;
+            let selected_option = req.body.selected_option;
+            selected_option = res.locals.translationService.getTranslationKey(selected_option)
+            // console.log(selected_option)
             const user_id = res.locals.user_id;
             if (!quiz_id) {
                 throw badRequest(speeches.QUIZ_ID_REQUIRED);

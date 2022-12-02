@@ -26,6 +26,7 @@ export class student extends Model<InferAttributes<student>, InferCreationAttrib
     declare state: string;
     declare country: string;
     declare badges: string;
+    declare certificate: number;
     declare status: Enumerator;
     declare created_by: number;
     declare created_at: Date;
@@ -106,15 +107,20 @@ student.init(
             type: DataTypes.ENUM(...Object.values(constents.common_status_flags.list)),
             defaultValue: constents.common_status_flags.default
         },
-        created_by: {
-            type: DataTypes.INTEGER,
+        certificate: {
+            type: DataTypes.DATE,
             allowNull: true,
-            defaultValue: null
+            defaultValue: DataTypes.NOW
         },
         created_at: {
             type: DataTypes.DATE,
             allowNull: false,
             defaultValue: DataTypes.NOW,
+        },
+        created_by: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: null
         },
         updated_by: {
             type: DataTypes.INTEGER,

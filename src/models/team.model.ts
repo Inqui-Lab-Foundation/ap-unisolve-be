@@ -5,7 +5,9 @@ import { constents } from '../configs/constents.config';
 import { mentor } from './mentor.model';
 import { student } from './student.model';
 
-export class team extends Model<teamAttributes> { }
+export class team extends Model<teamAttributes> {
+    static modelTableName="teams";
+}
 
 team.init(
     {
@@ -50,7 +52,7 @@ team.init(
     },
     {
         sequelize: db,
-        tableName: 'teams',
+        tableName: team.modelTableName,
         timestamps: true,
         updatedAt: 'updated_at',
         createdAt: 'created_at',

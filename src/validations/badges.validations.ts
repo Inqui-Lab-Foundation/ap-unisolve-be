@@ -3,7 +3,7 @@ import { constents } from '../configs/constents.config';
 import { speeches } from '../configs/speeches.config';
 
 export const badgeSchema = Joi.object().keys({
-    name: Joi.string().required().messages({
+    name: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.NAME_REQUIRED
     }),
     desc: Joi.string().allow(null, ''),
@@ -19,7 +19,7 @@ export const badgeUpdateSchema = Joi.object().keys({
         'any.only': speeches.COMMON_STATUS_INVALID,
         'string.empty': speeches.COMMON_STATUS_REQUIRED
     }),
-    name: Joi.string().required().messages({
+    name: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.NAME_REQUIRED
     }),
     desc: Joi.string().allow(null, ''),

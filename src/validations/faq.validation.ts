@@ -7,10 +7,10 @@ export const faqSchema = Joi.object().keys({
     faq_category_id: Joi.number().required().messages({
         'string.empty': speeches.FAQ_CATEGORY
     }),
-    question: Joi.string().required().messages({
+    question: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.QUESTION_REQUIRED
     }),
-    answer: Joi.string().required().messages({
+    answer: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.FAQ_ANSWER
     })
 });

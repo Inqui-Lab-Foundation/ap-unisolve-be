@@ -1,4 +1,4 @@
-import { badData, badRequest, internal, notFound, unauthorized } from "boom";
+import Boom, { badData, badRequest, internal, notAcceptable, notFound, unauthorized } from "boom";
 import { NextFunction, Request, Response } from "express";
 import { Op } from "sequelize";
 import db from "../utils/dbconnection.util";
@@ -12,9 +12,10 @@ import { quizSchema, quizSubmitResponseSchema, quizUpdateSchema } from "../valid
 import ValidationsHolder from "../validations/validationHolder";
 import BaseController from "./base.controller";
 import { quizSubmitResponsesSchema } from "../validations/quiz_survey.validations";
-import { challengeSchema, challengeSubmitResponsesSchema, challengeUpdateSchema } from "../validations/challenge.validations copy";
+import { challengeSchema, challengeSubmitResponsesSchema, challengeUpdateSchema, initiateIdeaSchema } from "../validations/challenge.validations copy";
 import { orderBy } from "lodash";
 import { student } from "../models/student.model";
+import { forbidden } from "joi";
 
 export default class ChallengeController extends BaseController {
 
@@ -28,8 +29,10 @@ export default class ChallengeController extends BaseController {
     }
     protected initializeRoutes(): void {
         //example route to add 
-        this.router.post(this.path + "/:id/responses/", validationMiddleware(challengeSubmitResponsesSchema), this.submitResponses.bind(this));
+        this.router.post(this.path + "/:id/submission/", validationMiddleware(challengeSubmitResponsesSchema), this.submitResponses.bind(this));
+        this.router.post(this.path + "/:id/initiate/", validationMiddleware(initiateIdeaSchema), this.initiateIdea.bind(this));
         this.router.get(this.path + '/submittedDetails', this.getResponse.bind(this));
+        this.router.get(`${this.path}/clearResponse`, this.clearResponse.bind(this))
         super.initializeRoutes();
     }
 
@@ -57,9 +60,19 @@ export default class ChallengeController extends BaseController {
                 next(error)
             });
             const where: any = {};
-            let whereClauseStatusPart: any = {};
+            let whereClauseStatusPart: any = {}
+            let boolStatusWhereClauseRequired = false;
             if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
-                whereClauseStatusPart = { "status": paramStatus }
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    boolStatusWhereClauseRequired = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    boolStatusWhereClauseRequired = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
+                boolStatusWhereClauseRequired = true;
             }
             if (id) {
                 where[`${this.model}_id`] = req.params.id;
@@ -98,7 +111,7 @@ export default class ChallengeController extends BaseController {
                     const result = this.getPagingData(responseOfFindAndCountAll, page, limit);
                     data = result;
                 } catch (error: any) {
-                    return res.status(500).send(dispatcher(res,data, 'error'))
+                    return res.status(500).send(dispatcher(res, data, 'error'))
                 }
 
             }
@@ -108,11 +121,11 @@ export default class ChallengeController extends BaseController {
                 } else {
                     throw notFound()
                 }
-                res.status(200).send(dispatcher(res,null, "error", speeches.DATA_NOT_FOUND));
+                res.status(200).send(dispatcher(res, null, "error", speeches.DATA_NOT_FOUND));
                 (data.message)
             }
 
-            return res.status(200).send(dispatcher(res,data, 'success'));
+            return res.status(200).send(dispatcher(res, data, 'success'));
         } catch (error) {
             next(error);
         }
@@ -136,7 +149,7 @@ export default class ChallengeController extends BaseController {
             };
             // console.log(studentDetailsBasedOnTeam.length);
             let dataToUpsert: any = {}
-            dataToUpsert = { challenge_id, team_id, updated_by: user_id, initiated_by: team_id, submitted_by: user_id }
+            dataToUpsert = { challenge_id, team_id, updated_by: user_id, initiated_by: user_id, submitted_by: user_id }
             let responseObjToAdd: any = {}
             responseObjToAdd = {
                 challenge_question_id: challenge_id,
@@ -218,16 +231,68 @@ export default class ChallengeController extends BaseController {
             const results: any = []
             let result: any = {}
             for (const element of responses) {
-                // console.log(element);
                 result = await this.insertSingleResponse(team_id, user_id, challenge_id, element.challenge_question_id, element.selected_option)
                 if (!result || result instanceof Error) {
-                    
                     throw badRequest();
                 } else {
                     results.push(result);
                 }
             }
-            res.status(200).send(dispatcher(res,result))
+            const updateStatus = await this.crudService.update(challenge_response, {
+                status: req.body.status,
+                sdg: req.body.sdg,
+                others: req.body.others
+            }, {
+                where: {
+                    [Op.and]: [
+                        { team_id: team_id }
+                    ]
+                }
+            });
+            res.status(200).send(dispatcher(res, result))
+        } catch (err) {
+            next(err)
+        }
+    }
+    protected async initiateIdea(req: Request, res: Response, next: NextFunction) {
+        try {
+            const challenge_id = req.params.id;
+            const { team_id } = req.query;
+            const user_id = res.locals.user_id;
+            if (!challenge_id) {
+                throw badRequest(speeches.CHALLENGE_ID_REQUIRED);
+            }
+            if (!team_id) {
+                throw unauthorized(speeches.USER_TEAMID_REQUIRED)
+            }
+            if (!user_id) {
+                throw unauthorized(speeches.UNAUTHORIZED_ACCESS);
+            }
+            const challengeRes = await this.crudService.findOne(challenge_response, { where: { challenge_id, team_id } });
+            if (challengeRes instanceof Error) {
+                throw internal(challengeRes.message)
+            }
+            if (challengeRes) {
+                throw notAcceptable(speeches.DATA_EXIST)
+            }
+            let dataUpset = {
+                sdg: req.body.sdg,
+                challenge_id: challenge_id,
+                team_id: team_id,
+                submitted_by: team_id,
+                initiated_by: user_id,
+                updated_by: user_id,
+                created_by: user_id,
+                response: JSON.stringify({})
+            }
+            let result: any = await this.crudService.create(challenge_response, dataUpset);
+            if (!result) {
+                throw badRequest(speeches.INVALID_DATA);
+            }
+            if (result instanceof Error) {
+                throw result;
+            }
+            res.status(200).send(dispatcher(res, result))
         } catch (err) {
             next(err)
         }
@@ -294,12 +359,13 @@ export default class ChallengeController extends BaseController {
                         },
                         attributes: [
                             "challenge_id",
-                            "idea_name",
+                            "others",
                             "team_id",
                             "response",
                             "initiated_by",
                             "response",
-                            "status"
+                            "status",
+                            "sdg"
                             // [
                             //     // Note the wrapping parentheses in the call below!
                             //     db.literal(`(
@@ -326,7 +392,7 @@ export default class ChallengeController extends BaseController {
                     const result = this.getPagingData(responseOfFindAndCountAll, page, limit);
                     data = result;
                 } catch (error: any) {
-                    return res.status(500).send(dispatcher(res,data, 'error'))
+                    return res.status(500).send(dispatcher(res, data, 'error'))
                 }
 
             }
@@ -339,7 +405,7 @@ export default class ChallengeController extends BaseController {
                 } else {
                     throw notFound()
                 }
-                res.status(200).send(dispatcher(res,null, "error", speeches.DATA_NOT_FOUND));
+                res.status(200).send(dispatcher(res, null, "error", speeches.DATA_NOT_FOUND));
                 // if(data!=null){
                 //     throw 
                 (data.message)
@@ -348,11 +414,34 @@ export default class ChallengeController extends BaseController {
                 // }
             }
             data.dataValues.forEach((element: any) => { element.dataValues.response = JSON.parse(element.dataValues.response) })
-            return res.status(200).send(dispatcher(res,data, 'success'));
+            return res.status(200).send(dispatcher(res, data, 'success'));
         } catch (error) {
             next(error);
         }
     }
+    private async clearResponse(req: Request, res: Response, next: NextFunction) {
+        // user_id or email_id will be getting from the params then find the
+        try {
+            const { team_id } = req.query
+            if (!team_id) {
+                throw badRequest(speeches.TEAM_NAME_ID)
+            };
+            const data = await this.crudService.delete(challenge_response, {
+                where: {
+                    team_id
+                }
+            })
+            if (!data) {
+                throw badRequest(data.message)
+            };
+            if (data instanceof Error) {
+                throw data;
+            }
+            return res.status(200).send(dispatcher(res, data, 'deleted'));
+        } catch (error) {
+            next(error)
+        }
+    };
 
     // protected async getNextQuestion(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     //     const { challenge_id, team_id } = req.params

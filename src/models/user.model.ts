@@ -16,6 +16,7 @@ export class user extends Model<InferAttributes<user>, InferCreationAttributes<u
     declare created_at: Date;
     declare updated_by: number;
     declare updated_at: Date;
+    static modelTableName = "users"
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -112,7 +113,7 @@ user.init(
     },
     {
         sequelize: db,
-        tableName: 'users',
+        tableName: user.modelTableName,
         timestamps: true,
         updatedAt: 'updated_at',
         createdAt: 'created_at',

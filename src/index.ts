@@ -35,6 +35,7 @@ import DashboardController from "./controllers/dashboard.controller";
 import TranslationController from "./controllers/translation.controller";
 import BadgeController from "./controllers/badge.controller";
 import TutorialVideoController from "./controllers/tutorial_video.controller";
+import ReportController from "./controllers/report.controller";
 
 // validating env variables
 validateEnv();
@@ -75,6 +76,7 @@ try {
         new TranslationController,
         new BadgeController,
         new TutorialVideoController,
+        new ReportController
     ], Number(process.env.APP_PORT));
     // starting app
     app.listen();

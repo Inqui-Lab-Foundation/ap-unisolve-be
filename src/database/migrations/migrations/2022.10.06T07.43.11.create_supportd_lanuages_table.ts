@@ -5,14 +5,59 @@ import { supported_language } from '../../../models/supported_language.model';
 
 // you can put some table-specific imports/code here
 export const tableName = supported_language.modelTableName;
+const structrue:any =  {
+	supported_language_id: {
+		type: DataTypes.INTEGER,
+		autoIncrement: true,
+		primaryKey: true
+	},
+	locale: {
+		type: DataTypes.STRING,
+		allowNull: false,
+		unique:true
+	},
+	status: {
+		type: DataTypes.ENUM(...Object.values(constents.common_status_flags.list)),
+		defaultValue: constents.common_status_flags.default
+	},
+	created_by: {
+		type: DataTypes.INTEGER,
+		allowNull: true,
+		defaultValue: null
+	},
+	created_at: {
+		type: DataTypes.DATE,
+		allowNull: true,
+		defaultValue: DataTypes.NOW,
+	},
+	updated_by: {
+		type: DataTypes.INTEGER,
+		allowNull: true,
+		defaultValue: null
+	},
+	updated_at: {
+		type: DataTypes.DATE,
+		allowNull: true,
+		defaultValue: DataTypes.NOW,
+		onUpdate: new Date().toLocaleString()
+	}
+};
 export const up: Migration = async ({ context: sequelize }) => {
 	// await sequelize.query(`raise fail('up migration not implemented')`); //call direct sql 
 	//or below implementation 
-	await sequelize.getQueryInterface().createTable(tableName, supported_language.structrue);
+	await sequelize.getQueryInterface().createTable(tableName, structrue);
 };
 
 export const down: Migration = async ({ context: sequelize }) => {
-	// 	await sequelize.query(`raise fail('down migration not implemented')`); //call direct sql 
-	//or below implementation 
-	await sequelize.getQueryInterface().dropTable(tableName);
+    // await sequelize.getQueryInterface().dropTable(tableName);
+	try {
+		await sequelize.transaction(async (transaction) => {
+		  const options = { transaction };
+		  await sequelize.query("SET FOREIGN_KEY_CHECKS = 0", options);
+		  await sequelize.query(`DROP TABLE ${tableName}`, options);
+		  await sequelize.query("SET FOREIGN_KEY_CHECKS = 1", options);
+		});
+} catch (error) {
+	throw error	  
+}
 };

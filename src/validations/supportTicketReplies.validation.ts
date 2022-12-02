@@ -6,7 +6,7 @@ export const supportTicketsReplies = Joi.object().keys({
     support_ticket_id: Joi.number().required().messages({
         'string.empty': speeches.ID_REQUIRED
     }),
-    reply_details: Joi.string().required().messages({
+    reply_details: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.QUERY_DETAILS
     })
 });

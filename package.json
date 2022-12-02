@@ -18,6 +18,8 @@
     "dbsync:force": "rm -rf dist && npm run build && node migrate.js",
     "migrate": "node src/database/migrations/migrate.js",
     "seed": "node src/database/seeders/seed.js",
+    "migrate:sql": "node src/database/migrations/migrateSql.js",
+    "seed:sql": "node src/database/seeders/seedSql.js",
     "scaffold:entity": "node -e 'require(\"./src/scaffolders/generate.js\").g()'"
   },
   "dependencies": {

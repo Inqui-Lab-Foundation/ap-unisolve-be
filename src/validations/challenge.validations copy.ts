@@ -44,24 +44,19 @@ export const challengeUpdateSchema = Joi.object().keys({
 //     // }),
 // });
 
+export const initiateIdeaSchema = Joi.object().keys({
+    sdg: Joi.string().required().messages({
+        'any.only': speeches.COMMON_STATUS_INVALID,
+    })
+});
 export const challengeSubmitResponsesSchema = Joi.object().keys({
-    // quiz_id: Joi.number().required().messages({
-    //     'string.empty': speeches.QUIZ_ID_REQUIRED
-    // }),
     responses: Joi.array().required().messages({
-        'array.empty': speeches.SELCTED_OPTION_REQUIRED
+        'any': speeches.SELCTED_OPTION_REQUIRED
     }),
-    // question:Joi.string().required().messages({
-    //     'string.empty': speeches.QUESTION_REQUIRED
-    // }),
-    // correct_answer:Joi.string().required().messages({
-    //     'string.empty': speeches.CORRECT_ANSWER_REQUIRED
-    // }),
-    // level:Joi.string().required().messages({
-    //     'string.empty': speeches.LEVEL_REQUIRED
-    // }),
-    // question_no:Joi.number().required().messages({
-    //     'string.empty': speeches.QUESTION_NO_REQUIRED
-    // }),
-
+    status: Joi.string().valid(...Object.values(constents.challenges_flags.list)).required().messages({
+        'any.only': speeches.COMMON_STATUS_INVALID,
+        'string.empty': speeches.COMMON_STATUS_REQUIRED
+    }),
+    sdg: Joi.any(),
+    others: Joi.any(),
 });

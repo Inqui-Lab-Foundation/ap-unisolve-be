@@ -3,6 +3,7 @@ import { constents } from '../configs/constents.config';
 import questionAttribute from '../interfaces/question.model.interface';
 import db from '../utils/dbconnection.util';
 import { quiz } from './quiz.model';
+import { user } from './user.model';
 
 export class quiz_survey_response extends Model<InferAttributes<quiz_survey_response>, InferCreationAttributes<quiz_survey_response>> {
     declare quiz_response_id: CreationOptional<number>;
@@ -81,3 +82,5 @@ quiz_survey_response.init(
 );
 
 //todo: add associations.. here 
+quiz_survey_response.belongsTo(user, { foreignKey: 'user_id', constraints: false, scope: { role: 'MENTOR' } });
+user.hasOne(quiz_survey_response, { foreignKey: 'user_id', constraints: false });

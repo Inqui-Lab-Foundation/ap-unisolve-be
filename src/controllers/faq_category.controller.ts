@@ -48,8 +48,15 @@ export default class FaqCategoryController extends BaseController {
             let whereClauseStatusPartLiteral = "1=1";
             let addWhereClauseStatusPart = false
             if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
-                whereClauseStatusPart = { "status": paramStatus }
-                whereClauseStatusPartLiteral = `status = "${paramStatus}"`
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    addWhereClauseStatusPart = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    addWhereClauseStatusPart = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
                 addWhereClauseStatusPart = true;
             }
             if (id) {

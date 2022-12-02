@@ -4,7 +4,7 @@ import { speeches } from '../configs/speeches.config';
 
 export const faqCategorySchema = Joi.object().keys({
    
-    category_name: Joi.string().required().messages({
+    category_name: Joi.string().trim().min(1).required().messages({
         'string.empty': speeches.NAME_REQUIRED
     })
 });

@@ -56,14 +56,20 @@ export default class MentorTopicProgressController extends BaseController {
             let payload = this.autoFillTrackingColumns(req, res, modelLoaded)
             payload.user_id = user_id;
             let data = {}
+            let msg = "OK";
             if(topicProgressAlreadyPresent){
-                data = await this.crudService.updateAndFind(modelLoaded, payload,{
-                    where:{
-                        user_id:user_id,
-                        mentor_course_topic_id:mentor_course_topic_id
-                    }
-                });
-                
+                const alreadyPresentStatus = topicProgressAlreadyPresent.dataValues.status;
+                if(alreadyPresentStatus.toLowerCase() !=payload.status.toLowerCase()){
+                    data = await this.crudService.updateAndFind(modelLoaded, payload,{
+                        where:{
+                            user_id:user_id,
+                            mentor_course_topic_id:mentor_course_topic_id
+                        }
+                    });
+                }else{
+                    data = topicProgressAlreadyPresent
+                    msg = "topic status was already "+alreadyPresentStatus
+                }
             }else{
                 data = await this.crudService.create(modelLoaded, payload);    
             }
@@ -76,7 +82,7 @@ export default class MentorTopicProgressController extends BaseController {
             if (!data) {
                 throw badRequest("sorry return data is empty.")
             }
-            return res.status(201).send(dispatcher(res,data, 'created'));
+            return res.status(201).send(dispatcher(res,data, 'created',msg));
         } catch (error) {
             next(error);
         }

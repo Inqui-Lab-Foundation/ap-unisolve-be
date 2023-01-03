@@ -7,6 +7,7 @@ export class challenge_question extends Model<InferAttributes<challenge_question
     declare challenge_question_id: CreationOptional<number>;
     declare challenge_id: ForeignKey<number>;
     declare question_no: number;
+    declare word_limit: number;
     declare question: string;
     declare description: string;
     declare option_a: string;
@@ -91,6 +92,11 @@ challenge_question.init(
         correct_ans: {
             type: DataTypes.TEXT,
             allowNull: false
+        },
+        word_limit: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            defaultValue: 100
         },
         type: {
             type: DataTypes.ENUM(...Object.values(constents.quiz_question_type_flags.list)),

@@ -21,7 +21,7 @@ import ReflectiveQuizController from "./controllers/reflective_quiz.controller";
 import MentorController from "./controllers/mentor.controller";
 import StudentController from "./controllers/student.controller";
 import AdminController from "./controllers/admin.controller";
-import EvaluaterController from "./controllers/evulator.controller";
+import EvaluatorController from "./controllers/evulator.controller";
 import QuizSurveyController from "./controllers/quiz_survey.controller";
 import MentorCourseController from "./controllers/mentorCourse.controller";
 import MentorAttachmentController from "./controllers/mentorAttachment.controller";
@@ -36,6 +36,10 @@ import TranslationController from "./controllers/translation.controller";
 import BadgeController from "./controllers/badge.controller";
 import TutorialVideoController from "./controllers/tutorial_video.controller";
 import ReportController from "./controllers/report.controller";
+import CertificateDownloadController from "./controllers/ceritificate_download.controller";
+import ChallengeResponsesController from "./controllers/challenge_response.controller";
+import InstructionController from "./controllers/instructions.controller";
+import EvaluationProcess from "./controllers/evaluation_process.controller";
 
 // validating env variables
 validateEnv();
@@ -61,7 +65,7 @@ try {
         new MentorController,
         new AdminController,
         new StudentController,
-        new EvaluaterController,
+        new EvaluatorController,
         new QuizSurveyController,
         new MentorCourseController,
         new MentorAttachmentController,
@@ -70,13 +74,17 @@ try {
         new SupportTicketRepliesController,
         new QuizQuestionsController,
         new ChallengeController,
+        new ChallengeResponsesController,
         new SupportTicketRepliesController,
         new UserController,
         new DashboardController,
         new TranslationController,
         new BadgeController,
         new TutorialVideoController,
-        new ReportController
+        new ReportController,
+        new CertificateDownloadController,
+        new InstructionController,
+        new EvaluationProcess
     ], Number(process.env.APP_PORT));
     // starting app
     app.listen();

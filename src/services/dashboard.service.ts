@@ -34,7 +34,8 @@ export default class DashboardService extends BaseService {
                         teams: stats.teamIdInDistrict.length,
                         ideas: stats.challengeInDistrict.length,
                         district_name: district.district,
-                        students: stats.studentsInDistric.length
+                        students: stats.studentsInDistric.length,
+                        schools_with_teams:stats.schoolIdsInDistrictWithTeams.length
                     })
                 }catch(err){
                     console.log(err)
@@ -50,6 +51,7 @@ export default class DashboardService extends BaseService {
                 ideas: statsForAllDistrics.challengeInDistrict.length,
                 district_name: "all",
                 students: statsForAllDistrics.studentsInDistric.length,
+                schools_with_teams:statsForAllDistrics.schoolIdsInDistrictWithTeams.length
             })
 
             await this.crudService.delete(dashboard_map_stat, { where: {}, truncate: true });
@@ -67,6 +69,7 @@ export default class DashboardService extends BaseService {
             let schoolIdsInDistrict:any =[];
             let mentorIdInDistrict:any =[];
             let registeredSchoolIdsInDistrict:any =[];
+            let schoolIdsInDistrictWithTeams:any =[];
             let teamIdInDistrict:any =[];
             let challengeInDistrict:any =[];
             let studentsInDistric:any =[];
@@ -74,9 +77,14 @@ export default class DashboardService extends BaseService {
             if (argdistric) {
                 whereClause = {
                     district: argdistric,
-                    status: "ACTIVE"
                 }
             }
+            
+            whereClause = {
+                ...whereClause,
+                status: "ACTIVE"
+            }
+            
             const overAllSchool = await this.crudService.findAll(organization, {
                 where: whereClause
             });
@@ -90,14 +98,16 @@ export default class DashboardService extends BaseService {
                     registeredSchoolIdsInDistrict: registeredSchoolIdsInDistrict,
                     teamIdInDistrict: teamIdInDistrict,
                     challengeInDistrict: challengeInDistrict,
-                    studentsInDistric: studentsInDistric
+                    studentsInDistric: studentsInDistric,
+                    schoolIdsInDistrictWithTeams:schoolIdsInDistrictWithTeams
                 }
             }
             schoolIdsInDistrict = overAllSchool.map((Element: any) => Element.dataValues.organization_code);
 
             const mentorReg = await this.crudService.findAll(mentor, {
                 where: {
-                    organization_code: schoolIdsInDistrict
+                    organization_code: schoolIdsInDistrict,
+                    status:'ACTIVE'
                 }
             });
             if(!mentorReg || (!mentorReg.length) || mentorReg.length==0){
@@ -106,7 +116,8 @@ export default class DashboardService extends BaseService {
                     registeredSchoolIdsInDistrict: registeredSchoolIdsInDistrict,
                     teamIdInDistrict: teamIdInDistrict,
                     challengeInDistrict: challengeInDistrict,
-                    studentsInDistric: studentsInDistric
+                    studentsInDistric: studentsInDistric,
+                    schoolIdsInDistrictWithTeams:schoolIdsInDistrictWithTeams
                 }
             }
             mentorIdInDistrict = mentorReg.map((Element: any) => Element.dataValues.mentor_id);//changed this to  user_id from mentor_id, because teams has mentor linked with team via user_id as value in the mentor_id collumn of the teams table
@@ -114,6 +125,7 @@ export default class DashboardService extends BaseService {
             const schoolRegistered = await this.crudService.findAll(mentor, {
                 where: {
                     mentor_id: mentorIdInDistrict,
+                    status:'ACTIVE'
                 },
                 group: ['organization_code']
             });
@@ -132,7 +144,10 @@ export default class DashboardService extends BaseService {
             
 
             const teamReg = await this.crudService.findAll(team, {
-                where: { mentor_id: mentorIdInDistrict }
+                where: { 
+                    mentor_id: mentorIdInDistrict ,
+                    status: 'ACTIVE'
+                }
             });
             if(!teamReg || (!teamReg.length) || teamReg.length==0){
                 return {
@@ -140,14 +155,44 @@ export default class DashboardService extends BaseService {
                     registeredSchoolIdsInDistrict: registeredSchoolIdsInDistrict,
                     teamIdInDistrict: teamIdInDistrict,
                     challengeInDistrict: challengeInDistrict,
-                    studentsInDistric: studentsInDistric
+                    studentsInDistric: studentsInDistric,
+                    schoolIdsInDistrictWithTeams:schoolIdsInDistrictWithTeams
                 }
             }
             teamIdInDistrict = teamReg.map((Element: any) => Element.dataValues.team_id);
             
+            //u could call below as schools with teams since one school can have only one mentor 
+            const distinctMentorsWithTeams = await team.findAll({
+                attributes:[
+                    "mentor_id",
+                ],
+                where:{
+                    mentor_id:mentorIdInDistrict,
+                    status:'ACTIVE'
+                },
+                group: ['mentor_id'],
+            })
+            if(!distinctMentorsWithTeams || (!distinctMentorsWithTeams.length) || distinctMentorsWithTeams.length==0){
+                // return {
+                //     schoolIdsInDistrict: schoolIdsInDistrict,
+                //     registeredSchoolIdsInDistrict: registeredSchoolIdsInDistrict,
+                //     teamIdInDistrict: teamIdInDistrict,
+                //     challengeInDistrict: challengeInDistrict,
+                //     studentsInDistric: studentsInDistric
+                // }
+                schoolIdsInDistrictWithTeams=[]
+            }else{
+                schoolIdsInDistrictWithTeams = distinctMentorsWithTeams.map((Element: any) => Element.dataValues.mentor_id);
+            }
+
+
             const challengeReg = await this.crudService.findAll(challenge_response, {
-                where: { team_id: teamIdInDistrict }
+                where: { 
+                    team_id: teamIdInDistrict,
+                    status: 'SUBMITTED'
+                }
             });
+
             if(!challengeReg || (!challengeReg.length) || challengeReg.length==0){
                 // return {
                 //     schoolIdsInDistrict: schoolIdsInDistrict,
@@ -168,7 +213,8 @@ export default class DashboardService extends BaseService {
                     "student_id"
                 ],
                 where: {
-                    team_id: teamIdInDistrict
+                    team_id: teamIdInDistrict,
+                    status: 'ACTIVE'
                 }
             })
             if(!studentsResult || (!studentsResult.length) || studentsResult.length==0){
@@ -190,7 +236,8 @@ export default class DashboardService extends BaseService {
                 registeredSchoolIdsInDistrict: registeredSchoolIdsInDistrict,
                 teamIdInDistrict: teamIdInDistrict,
                 challengeInDistrict: challengeInDistrict,
-                studentsInDistric: studentsInDistric
+                studentsInDistric: studentsInDistric,
+                schoolIdsInDistrictWithTeams:schoolIdsInDistrictWithTeams
             }
         }catch(err){
             return err
@@ -255,7 +302,7 @@ export default class DashboardService extends BaseService {
     }
     getDbLieralIdeaSubmission(addWhereClauseStatusPart: any, whereClauseStatusPartLiteral: any) {
         return `
-        select count(*) from challenge_responses as idea where idea.team_id = \`student\`.\`team_id\` 
+        select count(*) from challenge_responses as idea where idea.team_id = \`student\`.\`team_id\` and status = "SUBMITTED"
         `
     }
     getDbLieralForVideoToipcsCompletedCount(addWhereClauseStatusPart: any, whereClauseStatusPartLiteral: any) {
@@ -285,5 +332,14 @@ export default class DashboardService extends BaseService {
         //  return this.getDbLieralForAllToipcsCompletedCount(addWhereClauseStatusPart,whereClauseStatusPartLiteral)+
         //  `and t.topic_type = "QUIZ"`
     }
-
+    getDbLieralForPostSurveyCreatedAt(addWhereClauseStatusPart: any, whereClauseStatusPartLiteral: any) {
+        return `
+            SELECT created_at FROM unisolve_db.quiz_survey_responses where quiz_survey_id = 4 and user_Id = \`student\`.\`user_id\`
+            `
+    }
+    getDbLieralForCourseCompletedCreatedAt(addWhereClauseStatusPart: any, whereClauseStatusPartLiteral: any) {
+        return `
+            select created_at from user_topic_progress as utp where 1=1 and  utp.status = "COMPLETED" and course_topic_id = 34 and utp.user_id = \`student\`.\`user_id\` 
+        `
+    }
 }

@@ -28,7 +28,7 @@ export const speeches = {
     MOBILE_EXISTS: "Mobile Number already exists",
     STUDENT_EXISTS: "Student already exists",
     ADMIN_EXISTS: "Admin already exists",
-    EVALUATER_EXISTS: "Evaluater already exists",
+    EVALUATOR_EXISTS: "Evaluator already exists",
     USER_NOT_FOUND: "User not found",
     USER_REG_STATUS: "User blocked",
     USER_PASSWORD: "User pasword doesn't match",
@@ -86,7 +86,10 @@ export const speeches = {
     NOTIFICATION_DELETED_SUCCESSFULLY: "Notification deleted successfully",
 
     COMMON_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
+    EVALUATOR_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
+    CERTIFICATE_INVALID: `certificate type is invalid, it should be one from ${Object.values(constents.certificate_flags.list).join(", ")}.`,
     COMMON_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
+    EVALUATOR_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
 
     CHALLENGE_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.challenges_flags.list).join(", ")}.`,
     CHALLENGE_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.challenges_flags.list).join(", ")}.`,

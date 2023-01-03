@@ -24,7 +24,7 @@ export const speeches_en = {
     MENTOR_EXISTS: "Not Acceptable, Mentor already exists",
     STUDENT_EXISTS: "Not Acceptable, Student already exists",
     ADMIN_EXISTS: "Not Acceptable, Admin already exists",
-    EVALUATER_EXISTS: "Not Acceptable, Evaluater already exists",
+    EVALUATOR_EXISTS: "Not Acceptable, evaluator already exists",
     USER_NOT_FOUND: "User not found",
     USER_REG_STATUS: "User blocked",
     USER_PASSWORD: "User pasword doesn't match",

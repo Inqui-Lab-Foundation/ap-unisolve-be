@@ -24,7 +24,7 @@ export const speeches_tn = {
     MENTOR_EXISTS: "Not Acceptable, Mentor already exists",
     STUDENT_EXISTS: "Not Acceptable, Student already exists",
     ADMIN_EXISTS: "Not Acceptable, Admin already exists",
-    EVALUATER_EXISTS: "Not Acceptable, Evaluater already exists",
+    EVALUATOR_EXISTS: "Not Acceptable, evaluator already exists",
     USER_NOT_FOUND: "User not found",
     USER_REG_STATUS: "User blocked",
     USER_PASSWORD: "User pasword doesn't match",
@@ -97,7 +97,7 @@ export const speeches_tn = {
     ORG_CODE_REQUIRED: "Organization code is required.",
     ORG_CODE_NOT_EXISTS: "Organization code does not exists.",
     ORG_NAME_REQUIRED: "Organization name is required.",
-    
+
     PRINCIPAL_NAME_REQ: "principal name  is required.",
     PRINCIPAL_EMAIL_REQ: "principal email  is required.",
     PRINCIPAL_MOBILE_REQ: "principal mobile  is required.",

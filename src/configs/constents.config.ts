@@ -39,6 +39,13 @@ export const constents = {
     },
     default: 'ACTIVE'
   },
+  evaluation_process_status_flags: {
+    list: {
+      'ACCEPT_REJECT': 'ACCEPT_REJECT',
+      'RATING_SCALE': 'RATING_SCALE'
+    },
+    default: 'ACCEPT_REJECT'
+  },
   tut_videos_type_flags: {
     list: {
       'ALL': 'ALL',
@@ -86,9 +93,10 @@ export const constents = {
   user_role_flags: {
     list: {
       'ADMIN': 'ADMIN',
-      'EVALUATER': 'EVALUATER',
+      'EVALUATOR': 'EVALUATOR',
       'MENTOR': 'MENTOR',
-      'STUDENT': 'STUDENT'
+      'STUDENT': 'STUDENT',
+      "EADMIN": "EADMIN"
     },
     default: 'ADMIN'
   },
@@ -164,6 +172,14 @@ export const constents = {
     },
     default: "DRAFT"
   },
+  evaluation_status: {
+    list: {
+      "EVALUATION": "EVALUATION",
+      "SELECTEDROUND1": "SELECTEDROUND1",
+      "REJECTEDROUND1": "REJECTEDROUND1"
+    },
+    default: "EVALUATION"
+  },
   quiz_survey_status_flags: {
     list: {
       "ALL": "ALL",
@@ -186,7 +202,15 @@ export const constents = {
     default: "ALL"
   },
   TEAMS_MAX_STUDENTS_ALLOWED: 5,
-  ALPHA_NUMERIC_PATTERN : /^[a-zA-Z0-9 ]*$/,
+  ALPHA_NUMERIC_PATTERN: /^[a-zA-Z0-9 ]*$/,
+  certificate_flags: {
+    list: {
+      '1': '1',
+      '2': '2',
+      '3': '3',
+    },
+    default: '1'
+  },
   TRANSLATION_CONFIG:{
     table_column : {
       "quiz_questions" : {
@@ -210,5 +234,11 @@ export const constents = {
         'accimg_ans_wrong',
       ]}
     }
+  },
+  SEQUELIZE_FLAGS:{
+    DEFAULT_EXCLUDE_SCOPE:['created_at','created_by','updated_at','updated_by','status'],
+    DEFAULT_EXCLUDE_SCOPE_WITHOUT_STATUS:['created_at','created_by','updated_at','updated_by'],
+    DEFAULT_EXCLUDE_SCOPE_WITHOUT_STATUS_CREATEDATTRS:['updated_at','updated_by'],
+    WITH_DEBUGATTRS:[]
   }
 };

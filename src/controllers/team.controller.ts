@@ -53,8 +53,6 @@ export default class TeamController extends BaseController {
                          mentor_id: mentor_id 
                         }
                 });
-                console.log(mentor_id);
-                console.log(getUserIdFromMentorId);
                 if (!getUserIdFromMentorId) throw badRequest(speeches.MENTOR_NOT_EXISTS);
                 if (getUserIdFromMentorId instanceof Error) throw getUserIdFromMentorId;
                 const providedMentorsUserId = getUserIdFromMentorId.getDataValue("user_id");
@@ -80,6 +78,66 @@ export default class TeamController extends BaseController {
                 whereClauseStatusPart = { "status": paramStatus }
                 whereClauseStatusPartLiteral = `status = "${paramStatus}"`
                 addWhereClauseStatusPart = true;
+            }
+            //attributes separating for challenge submission;
+            let attributesNeeded: any = [];
+            const ideaStatus = req.query.ideaStatus;
+            if (ideaStatus && ideaStatus == 'true') {
+                attributesNeeded = [
+                    'team_name',
+                    'team_id',
+                    'mentor_id',
+                    'status',
+                    'created_at',
+                    'created_by',
+                    'updated_at',
+                    'updated_by',
+                    [
+                        db.literal(`(
+                            SELECT COUNT(*)
+                            FROM students AS s
+                            WHERE
+                                ${addWhereClauseStatusPart ? "s." + whereClauseStatusPartLiteral : whereClauseStatusPartLiteral}
+                            AND
+                                s.team_id = \`team\`.\`team_id\`
+                        )`), 'student_count'
+                    ],
+                    [
+                        db.literal(`(
+                            SELECT status
+                            FROM challenge_responses AS idea
+                            WHERE idea.team_id = \`team\`.\`team_id\`
+                        )`), 'ideaStatus'
+                    ],
+                    [
+                        db.literal(`(
+                            SELECT challenge_response_id
+                            FROM challenge_responses AS idea
+                            WHERE idea.team_id = \`team\`.\`team_id\`
+                        )`), 'challenge_response_id'
+                    ]
+                ]
+            } else {
+                attributesNeeded = [
+                    'team_name',
+                    'team_id',
+                    'mentor_id',
+                    'status',
+                    'created_at',
+                    'created_by',
+                    'updated_at',
+                    'updated_by',
+                    [
+                        db.literal(`(
+                            SELECT COUNT(*)
+                            FROM students AS s
+                            WHERE
+                                ${addWhereClauseStatusPart ? "s." + whereClauseStatusPartLiteral : whereClauseStatusPartLiteral}
+                            AND
+                                s.team_id = \`team\`.\`team_id\`
+                        )`), 'student_count'
+                    ]
+                ]
             }
             if (id) {
                 where[`${this.model}_id`] = req.params.id;
@@ -114,26 +172,7 @@ export default class TeamController extends BaseController {
             } else {
                 try {
                     const responseOfFindAndCountAll = await this.crudService.findAndCountAll(modelClass, {
-                        attributes: [
-                            'team_name',
-                            'team_id',
-                            'mentor_id',
-                            'status',
-                            'created_at',
-                            'created_by',
-                            'updated_at',
-                            'updated_by',
-                            [
-                                db.literal(`(
-                            SELECT COUNT(*)
-                            FROM students AS s
-                            WHERE
-                                ${addWhereClauseStatusPart ? "s." + whereClauseStatusPartLiteral : whereClauseStatusPartLiteral}
-                            AND
-                                s.team_id = \`team\`.\`team_id\`
-                        )`), 'student_count'
-                            ]
-                        ],
+                        attributes: attributesNeeded,
                         where: {
                             [Op.and]: [
                                 whereClauseStatusPart,

@@ -14,6 +14,7 @@ import { constents } from '../configs/constents.config';
 export default class CRUDController implements IController {
     model: string = "";
     public path = "";
+    public statusFlagsToUse:any = []
     public router = Router();
     crudService: CRUDService = new CRUDService();
 
@@ -22,6 +23,7 @@ export default class CRUDController implements IController {
     }
 
     protected init(): void {
+        this.initializeStatusFlags()
         this.initializePath();
         this.initializeRoutes();
     }
@@ -29,6 +31,11 @@ export default class CRUDController implements IController {
     protected initializePath() {
         this.path = '/crud';
     }
+
+    protected initializeStatusFlags() {
+        this.statusFlagsToUse = constents.common_status_flags.list;
+    }
+
 
     protected initializeRoutes(aditionalrouts: any = []): void {
         this.router.get(`${this.path}/:model`, this.getData.bind(this));
@@ -75,7 +82,95 @@ export default class CRUDController implements IController {
         return payload;
     }
 
-    protected async getData(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+
+    protected async getData(req: Request, res: Response, next: NextFunction,
+        findQueryWhereClauseArr:any=[],
+        findQueryAttrs:any={exclude:[]},
+        findQueryinclude:any=null,
+        findQueryOrderArr:any=[]
+        ): Promise<Response | void> {
+        try {
+
+            let data: any;
+            const { model, id } = req.params;
+            const paramStatus: any = req.query.status;
+            if (model) {
+                this.model = model;
+            };
+            // pagination
+            const { page, size, status } = req.query;
+            // let condition = status ? { status: { [Op.like]: `%${status}%` } } : null;
+            const { limit, offset } = this.getPagination(page, size);
+            const modelClass = await this.loadModel(model).catch(error => {
+                next(error)
+            });
+            const where: any = {};
+            let objwhereClauseStatusPart = this.getWhereClauseStatsPart(req);
+
+            if (id) {
+                where[`${this.model}_id`] = req.params.id;
+                data = await this.crudService.findOne(modelClass, {
+                    attributes:findQueryAttrs,
+                    where: {
+                        [Op.and]: [
+                            objwhereClauseStatusPart.whereClauseStatusPart,
+                            where,
+                            ...findQueryWhereClauseArr
+                        ]
+                    },
+                    include:findQueryinclude,
+                    order:findQueryOrderArr
+                });
+            } else {
+                try {
+                    const responseOfFindAndCountAll = await this.crudService.findAndCountAll(modelClass, {
+                        attributes:findQueryAttrs,
+                        where: {
+                            [Op.and]: [
+                                objwhereClauseStatusPart.whereClauseStatusPart,
+                                ...findQueryWhereClauseArr
+                            ]
+                        },
+                        include:findQueryinclude,
+                        limit, offset,
+                        order:findQueryOrderArr
+                    })
+                    const result = this.getPagingData(responseOfFindAndCountAll, page, limit);
+                    data = result;
+                } catch (error: any) {
+                    console.log(error)
+                    //  res.status(500).send(dispatcher(res,data, 'error'))
+                    next(error)
+                }
+
+            }
+            // if (!data) {
+            //     return res.status(404).send(dispatcher(res,data, 'error'));
+            // }
+            if (!data || data instanceof Error) {
+                if (data != null) {
+                    throw notFound(data.message)
+                } else {
+                    throw notFound()
+                }
+                res.status(200).send(dispatcher(res,null, "error", speeches.DATA_NOT_FOUND));
+                // if(data!=null){
+                //     throw 
+                (data.message)
+                // }else{
+                //     throw notFound()
+                // }
+            }
+            return res.status(200).send(dispatcher(res,data, 'success'));
+        } catch (error) {
+            console.log(error)
+            next(error);
+        }
+    }
+
+    //@deprecated
+    //remove this after stability confirmed for the newly written function just above this function...!!
+    protected async getDataOld(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
             let data: any;
             const { model, id } = req.params;
@@ -379,5 +474,34 @@ export default class CRUDController implements IController {
                 return res.status(400).send(dispatcher(res,{ createdEntities: counter, existedEntities }, 'error', speeches.CSV_DATA_EXIST, 400));
             }
         });
+    }
+
+    protected getWhereClauseStatsPart(req:Request):any{
+        const paramStatus:any = req.query.status
+        let whereClauseStatusPart:any = {};
+        let whereClauseStatusPartLiteral = "1=1";
+        let addWhereClauseStatusPart = false
+        
+        if (paramStatus && (paramStatus in this.statusFlagsToUse)) {
+            if (paramStatus === 'ALL') {
+                whereClauseStatusPart = {};
+                addWhereClauseStatusPart = false;
+            } else {
+                whereClauseStatusPart = { "status": paramStatus };
+                whereClauseStatusPartLiteral = `status = "${paramStatus}"`
+                addWhereClauseStatusPart = true;
+            }
+        } else {
+            whereClauseStatusPart = { "status": "ACTIVE" };
+            whereClauseStatusPartLiteral = `status = "ACTIVE"`
+            addWhereClauseStatusPart = true;
+        }
+
+        return {
+            paramStatus:paramStatus,
+            whereClauseStatusPart:whereClauseStatusPart,
+            whereClauseStatusPartLiteral:whereClauseStatusPartLiteral,
+            addWhereClauseStatusPart:addWhereClauseStatusPart
+        }
     }
 }

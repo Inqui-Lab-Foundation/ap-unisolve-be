@@ -2,6 +2,7 @@
 import { Request, Response, NextFunction } from "express";
 import { ParamsDictionary } from "express-serve-static-core";
 import { ParsedQs } from "qs";
+import { constents } from "../configs/constents.config";
 import { badgeSchema, badgeUpdateSchema } from "../validations/badges.validations";
 import ValidationsHolder from "../validations/validationHolder";
 import BaseController from "./base.controller";
@@ -24,5 +25,10 @@ export default class BadgeController extends BaseController {
     protected  async createData(req: Request, res: Response, next: NextFunction) {
         const copy = await this.copyAllFiles(req, "badge", "images", "badges");
         return super.createData(req, res, next);
+    }
+
+    protected getData(req: Request, res: Response, next: NextFunction) {
+        return super.getData(req,res,next,[],
+                    {exclude:constents.SEQUELIZE_FLAGS.DEFAULT_EXCLUDE_SCOPE})
     }
 }

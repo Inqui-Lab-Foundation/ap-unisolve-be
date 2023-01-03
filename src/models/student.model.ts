@@ -110,7 +110,7 @@ student.init(
         certificate: {
             type: DataTypes.DATE,
             allowNull: true,
-            defaultValue: DataTypes.NOW
+            defaultValue: null
         },
         created_at: {
             type: DataTypes.DATE,

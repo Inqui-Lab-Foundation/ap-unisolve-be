@@ -211,11 +211,11 @@ CREATE TABLE `dashboard_map_stats` (
 
 
 
-# Dump of table evaluaters
+# Dump of table evaluators
 # ------------------------------------------------------------
 
-CREATE TABLE `evaluaters` (
-  `evaluater_id` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `evaluators` (
+  `evaluator_id` int NOT NULL AUTO_INCREMENT,
   `user_id` int NOT NULL,
   `full_name` varchar(255) NOT NULL,
   `date_of_birth` datetime DEFAULT NULL,
@@ -230,9 +230,9 @@ CREATE TABLE `evaluaters` (
   `created_at` datetime DEFAULT NULL,
   `updated_by` int DEFAULT NULL,
   `updated_at` datetime DEFAULT NULL,
-  PRIMARY KEY (`evaluater_id`),
+  PRIMARY KEY (`evaluator_id`),
   KEY `user_id` (`user_id`),
-  CONSTRAINT `evaluaters_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+  CONSTRAINT `evaluators_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
@@ -913,7 +913,7 @@ CREATE TABLE `users` (
   `full_name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `status` enum('ACTIVE','INACTIVE','DELETED','LOCKED') DEFAULT 'ACTIVE',
-  `role` enum('ADMIN','EVALUATER','MENTOR','STUDENT') DEFAULT 'ADMIN',
+  `role` enum('ADMIN','evaluator','MENTOR','STUDENT') DEFAULT 'ADMIN',
   `is_loggedin` enum('YES','NO') DEFAULT 'NO',
   `last_login` datetime DEFAULT NULL,
   `created_by` int DEFAULT NULL,
@@ -936,7 +936,7 @@ CREATE TABLE `users_bk` (
   `full_name` varchar(255) NOT NULL,
   `password` varchar(255) NOT NULL,
   `status` enum('ACTIVE','INACTIVE','DELETED','LOCKED') DEFAULT 'ACTIVE',
-  `role` enum('ADMIN','EVALUATER','MENTOR','STUDENT') DEFAULT 'ADMIN',
+  `role` enum('ADMIN','evaluator','MENTOR','STUDENT') DEFAULT 'ADMIN',
   `is_loggedin` enum('YES','NO') DEFAULT 'NO',
   `last_login` datetime DEFAULT NULL,
   `created_by` int DEFAULT NULL,

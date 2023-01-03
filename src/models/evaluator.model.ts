@@ -6,36 +6,21 @@ import { notification } from './notification.model';
 import { baseConfig } from '../configs/base.config';
 import { user } from './user.model';
 
-export class evaluater extends Model<InferAttributes<evaluater>, InferCreationAttributes<evaluater>> {
-    declare evaluater_id: CreationOptional<number>;
+export class evaluator extends Model<InferAttributes<evaluator>, InferCreationAttributes<evaluator>> {
+    declare evaluator_id: CreationOptional<number>;
     declare user_id: string;
     declare full_name: string;
-    declare date_of_birth: Date;
-    declare organization_name: string;
-    declare qualification: string;
-    declare city: string;
+    declare mobile: string;
     declare district: string;
-    declare state: string;
-    declare country: string;
     declare status: Enumerator;
     declare created_by: number;
     declare created_at: Date;
     declare updated_by: number;
     declare updated_at: Date;
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
-    static associate(models: any) {
-        // define association here
-        evaluater.hasMany(notification, { sourceKey: 'notification_id', as: 'notifications' });
-    }
-}
 
-evaluater.init(
-    {
-        evaluater_id: {
+    static modelTableName = 'evaluators';
+    static structure: any = {
+        evaluator_id: {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
@@ -48,29 +33,12 @@ evaluater.init(
             type: DataTypes.STRING,
             allowNull: false,
         },
-        date_of_birth: {
-            type: DataTypes.DATE,
-            allowNull: true
-        },
-        organization_name: {
-            type: DataTypes.STRING,
-            allowNull: true,
-        },
-        qualification: {
-            type: DataTypes.STRING,
-            allowNull: true
-        },
-        city: {
-            type: DataTypes.STRING
-        },
         district: {
             type: DataTypes.STRING
         },
-        state: {
-            type: DataTypes.STRING
-        },
-        country: {
-            type: DataTypes.STRING
+        mobile: {
+            type: DataTypes.STRING,
+            unique: true
         },
         status: {
             type: DataTypes.ENUM(...Object.values(constents.common_status_flags.list)),
@@ -97,10 +65,18 @@ evaluater.init(
             defaultValue: DataTypes.NOW,
             onUpdate: new Date().toLocaleString()
         }
-    },
+    };
+    static associate(models: any) {
+        // define association here
+        evaluator.hasMany(notification, { sourceKey: 'notification_id', as: 'notifications' });
+    }
+}
+
+evaluator.init(
+    evaluator.structure,
     {
         sequelize: db,
-        tableName: 'evaluaters',
+        tableName: evaluator.modelTableName,
         timestamps: true,
         updatedAt: 'updated_at',
         createdAt: 'created_at',
@@ -119,5 +95,5 @@ evaluater.init(
     }
 );
 
-evaluater.belongsTo(user, { foreignKey: 'user_id' , constraints: false});
-user.hasOne(evaluater, { foreignKey: 'user_id', constraints: false, scope: { role: 'EVALUATER' }});
+evaluator.belongsTo(user, { foreignKey: 'user_id', constraints: false });
+user.hasOne(evaluator, { foreignKey: 'user_id', constraints: false, scope: { role: 'EVALUATOR' } });

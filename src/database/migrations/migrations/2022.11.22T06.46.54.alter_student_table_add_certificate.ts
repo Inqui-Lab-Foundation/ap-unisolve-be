@@ -11,7 +11,7 @@ export const up: Migration = async ({ context: sequelize }) => {
 	await sequelize.getQueryInterface().addColumn(tableName, columnName, {
 		type: DataTypes.DATE,
 		allowNull: true,
-		defaultValue: DataTypes.NOW
+		defaultValue: null
 	});
 };
 

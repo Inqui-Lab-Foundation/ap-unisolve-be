@@ -37,8 +37,9 @@ export default class SupportTicketController extends BaseController {
                 this.model = model;
             };
             // pagination
-            const { page, size, status } = req.query;
+            const { page, size, status, user_id } = req.query;
             let condition = status ? { status: { [Op.like]: `%${status}%` } } : null;
+            let filteringBasedOnUser_id = user_id ? { created_by: user_id } : null;
             const { limit, offset } = this.getPagination(page, size);
             const modelClass = await this.loadModel(model).catch(error => {
                 next(error)
@@ -110,8 +111,8 @@ export default class SupportTicketController extends BaseController {
                         ],
                         where: {
                             [Op.and]: [
-                                // whereClauseStatusPart,
-                                condition
+                                condition,
+                                filteringBasedOnUser_id
                             ]
                         },
                         limit, offset,

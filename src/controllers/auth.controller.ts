@@ -21,7 +21,7 @@ import { baseConfig } from '../configs/base.config';
 import { admin } from '../models/admin.model';
 import { mentor } from '../models/mentor.model';
 import { student } from '../models/student.model';
-import { evaluater } from '../models/evaluater.model';
+import { evaluator } from '../models/evaluator.model';
 import { badRequest } from 'boom';
 import { nanoid } from 'nanoid'
 import roadMapMasterObject from '../configs/roadMapConfig';
@@ -39,7 +39,7 @@ export default class AuthController implements IController {
         this.router = Router();
         this.initializeRoutes();
     }
-    // we are disabling this controller, using individual login controllers students/login, mentors/login, evaluater/login, admins/login
+    // we are disabling this controller, using individual login controllers students/login, mentors/login, evaluator/login, admins/login
 
     private initializeRoutes(): void {
         // this.router.post(`${this.path}/login`, this.login);
@@ -110,7 +110,7 @@ export default class AuthController implements IController {
                     case 'MENTOR': {
                         if (user_res.role !== req.body.role) stop_issuing_token = true;
                     }
-                    case 'EVALUATER': {
+                    case 'EVALUATOR': {
                         if (user_res.role !== req.body.role) stop_issuing_token = true;
                     }
                 }
@@ -200,8 +200,8 @@ export default class AuthController implements IController {
                         break;
                     } else { res.status(400).send({ messene: 'error' }) }
                 }
-                case 'EVALUATER': {
-                    profile = await this.crudService.create(evaluater, whereClass);
+                case 'EVALUATOR': {
+                    profile = await this.crudService.create(evaluator, whereClass);
                     break;
                 }
                 default:
@@ -337,9 +337,9 @@ export default class AuthController implements IController {
                 role = 'STUDENT'
                 break;
             }
-            case 'evaluater': {
-                loadMode = evaluater;
-                role = 'EVALUATER'
+            case 'evaluator': {
+                loadMode = evaluator;
+                role = 'EVALUATOR'
                 break;
             }
             case 'mentor': {

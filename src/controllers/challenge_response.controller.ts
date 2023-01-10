@@ -575,6 +575,7 @@ export default class ChallengeResponsesController extends BaseController {
             const errs: any = [];
             let attachments: any = [];
             let result: any = {};
+            let file_name_prefix: any;
             let s3 = new S3({
                 apiVersion: '2006-03-01',
                 region: process.env.AWS_REGION,
@@ -584,11 +585,10 @@ export default class ChallengeResponsesController extends BaseController {
             if (!req.files) {
                 return result;
             }
-            let file_name_prefix: any;
-            if (process.env.NODE_ENV == "prod") {
-                file_name_prefix = `ap_ideas/${team_id}`
+            if (process.env.DB_HOST == "ls-ea6dc83d3df52f512dfbfa20261768bab79a69a4.chen5dyzmtrc.ap-south-1.rds.amazonaws.com") {
+                file_name_prefix = `ideas/stage/${team_id}`
             } else {
-                file_name_prefix = `ap_ideas/stage/${team_id}`
+                file_name_prefix = `ideas/${team_id}`
             }
             for (const file_name of Object.keys(files)) {
                 const file = files[file_name];

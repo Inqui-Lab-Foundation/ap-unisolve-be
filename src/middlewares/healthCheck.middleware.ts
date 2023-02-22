@@ -1,7 +1,5 @@
 import {Request, Response, NextFunction} from 'express';
 import database from '../utils/dbconnection.util';
-import HttpException from '../utils/exceptions/http.exception';
-import logger from '../utils/logger';
 
 export default async function healthCheckMiddleware(
     req: Request, 

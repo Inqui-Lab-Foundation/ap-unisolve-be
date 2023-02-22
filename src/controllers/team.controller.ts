@@ -13,6 +13,7 @@ import { team } from "../models/team.model";
 import { student } from "../models/student.model";
 import { user } from "../models/user.model";
 import { mentor } from "../models/mentor.model";
+import { challenge_response } from "../models/challenge_response.model";
 
 export default class TeamController extends BaseController {
 
@@ -307,6 +308,7 @@ export default class TeamController extends BaseController {
     protected async deleteData(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
             let deletingTeamDetails: any;
+            let deletingChallengeDetails: any;
             let deleteTeam: any = 1;
             const { model, id } = req.params;
             if (model) {
@@ -334,6 +336,7 @@ export default class TeamController extends BaseController {
                 }
             };
             if (deleteTeam >= 1) {
+                deletingChallengeDetails = await this.crudService.delete(challenge_response, { where: { team_id: getTeamDetails.dataValues.team_id } });
                 deletingTeamDetails = await this.crudService.delete(await this.loadModel(model), { where: where });
             }
             return res.status(200).send(dispatcher(res, deletingTeamDetails, 'deleted'));

@@ -1,8 +1,6 @@
 import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { constents } from '../configs/constents.config';
-import questionAttribute from '../interfaces/question.model.interface';
 import db from '../utils/dbconnection.util';
-import { quiz } from './quiz.model';
 
 export class quiz_response extends Model<InferAttributes<quiz_response>, InferCreationAttributes<quiz_response>> {
     declare quiz_response_id: CreationOptional<number>;

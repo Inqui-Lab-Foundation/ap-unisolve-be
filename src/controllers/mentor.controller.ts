@@ -373,7 +373,12 @@ export default class MentorController extends BaseController {
             else {
                 // mentorDetails = await this.authService.getServiceDetails('mentor', { user_id: result.data.user_id });
                 // result.data['mentor_id'] = mentorDetails.dataValues.mentor_id
-                const mentorData = await this.authService.crudService.findOne(mentor, { where: { user_id: result.data.user_id } });
+                const mentorData = await this.authService.crudService.findOne(mentor, {
+                    where: { user_id: result.data.user_id },
+                    include: {
+                        model: organization
+                    }
+                });
                 if (!mentorData || mentorData instanceof Error) {
                     return res.status(404).send(dispatcher(res, null, 'error', speeches.USER_REG_STATUS));
                 }
@@ -381,6 +386,7 @@ export default class MentorController extends BaseController {
                     return res.status(404).send(dispatcher(res, null, 'error', speeches.USER_REG_STATUS));
                 }
                 result.data['mentor_id'] = mentorData.dataValues.mentor_id;
+                result.data['organization_name'] = mentorData.dataValues.organization.organization_name;
                 return res.status(200).send(dispatcher(res, result.data, 'success', speeches.USER_LOGIN_SUCCESS));
             }
         } catch (error) {

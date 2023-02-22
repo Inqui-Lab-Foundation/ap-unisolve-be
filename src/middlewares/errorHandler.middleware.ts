@@ -1,6 +1,5 @@
 import HttpStatus from 'http-status-codes';
 
-import logger from '../utils/logger';
 import buildError from '../utils/build_error';
 import { ErrorRequestHandler, NextFunction, Request, Response } from 'express';
 import logIt from '../utils/logit.util';
@@ -9,12 +8,10 @@ import dispatcher from '../utils/dispatch.util';
 
 /**
  * Error response middleware for 404 not found.
- *
  * @param {Object} req
  * @param {Object} res
  */
 export function notFound(req:Request, res:Response) {
-  // console.log(res)
   res.status(HttpStatus.NOT_FOUND).json({
       code: HttpStatus.NOT_FOUND,
       message: HttpStatus.getStatusText(HttpStatus.NOT_FOUND),

@@ -6,7 +6,6 @@ import { constents } from '../configs/constents.config';
 export class tutorial_video extends Model<InferAttributes<tutorial_video>, InferCreationAttributes<tutorial_video>> {
     
     declare tutorial_video_id: CreationOptional<number>;
-    // declare badge_no: number;
     declare video_stream_id: CreationOptional<string>;
     declare title: string;
     declare desc: CreationOptional<string>;
@@ -28,9 +27,6 @@ export class tutorial_video extends Model<InferAttributes<tutorial_video>, Infer
             type: DataTypes.STRING,
             allowNull:false,
         },
-        // badge_no: {
-        //     type: DataTypes.INTEGER
-        // },
         title: {
             type: DataTypes.STRING,
         },

@@ -151,10 +151,10 @@ export default class OrganizationController extends BaseController {
                 },
                 group: ['district']
             });
+            response.push('All Districts');
             result.forEach((obj: any) => {
                 response.push(obj.dataValues.district)
             });
-            response.push('All Districts');
             return res.status(200).send(dispatcher(res, response, 'success'));
         } catch (error) {
             console.log(error)

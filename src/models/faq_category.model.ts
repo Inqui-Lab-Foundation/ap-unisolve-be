@@ -1,7 +1,6 @@
 import {  DataTypes, Model } from 'sequelize';
 import { constents } from '../configs/constents.config';
 import db from '../utils/dbconnection.util';
-import { faq } from './faq.model';
 
 
 export interface faqCategoryAttributes {

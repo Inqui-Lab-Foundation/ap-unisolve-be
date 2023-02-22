@@ -1,7 +1,6 @@
 
 import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import db from '../utils/dbconnection.util';
-// import { userTopicProgressAttributes } from '../interfaces/model.interface';
 import { course_topic } from './course_topic.model';
 import { user } from './user.model';
 import { constents } from '../configs/constents.config';
@@ -24,7 +23,6 @@ export class mentor_topic_progress extends Model<InferAttributes<mentor_topic_pr
      * The "models/index" file will call this method automatically.
      */
     static associate(models: any) {
-        // console.log("came here");
         // define association here
         // course.hasMany(models, { foreignKey: "course_id", as: "courseModules" });
     }

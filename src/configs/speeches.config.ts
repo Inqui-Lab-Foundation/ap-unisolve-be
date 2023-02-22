@@ -43,7 +43,7 @@ export const speeches = {
     USER_FULLNAME_EXISTED: "Student full name already existed",
     USER_REGISTERED_SUCCESSFULLY: "User registered successfully",
     USER_LOGIN_SUCCESS: "Login Successful",
-    USER_BADGES_LINKED:"Badge added to user successfully",
+    USER_BADGES_LINKED: "Badge added to user successfully",
     LOGOUT_SUCCESS: "Logout Successful",
     USER_EMAIL_REQUIRED: "Email is required, it should not be empty.",
     USER_EMAIL_INVALID: "Email is invalid, it should be a valid email.",
@@ -57,7 +57,7 @@ export const speeches = {
     TEAM_NAME_REQUIRED: "Team name is required, it should not be empty.",
     TEAM_NAME_ID: "Team ID is required, it should not be empty.",
     TEAM_NOT_FOUND: "Team not found, check the teamID.",
-    TEAM_MAX_MEMBES_EXCEEDED:`Team can have at max ${""+constents.TEAMS_MAX_STUDENTS_ALLOWED} members`,
+    TEAM_MAX_MEMBES_EXCEEDED: `Team can have at max ${"" + constents.TEAMS_MAX_STUDENTS_ALLOWED} members`,
     //quiz submit response keys
     QUIZ_ID_REQUIRED: "Quiz ID is required, it should not be empty.",
     CHALLENGE_ID_REQUIRED: "Challenge ID is required, it should not be empty.",
@@ -86,11 +86,12 @@ export const speeches = {
     NOTIFICATION_DELETED_SUCCESSFULLY: "Notification deleted successfully",
 
     COMMON_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
+    RATING_STATUS_INVALID: `Rating is invalid, it should be one from ${Object.values(constents.evaluator_rating_level_flags.list).join(", ")}.`,
+    COMMON_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
+    RATING_STATUS_REQUIRED: `Rating is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
     EVALUATOR_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
     CERTIFICATE_INVALID: `certificate type is invalid, it should be one from ${Object.values(constents.certificate_flags.list).join(", ")}.`,
-    COMMON_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
     EVALUATOR_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.common_status_flags.list).join(", ")}.`,
-
     CHALLENGE_STATUS_INVALID: `Status is invalid, it should be one from ${Object.values(constents.challenges_flags.list).join(", ")}.`,
     CHALLENGE_STATUS_REQUIRED: `Status is required, it should be one from ${Object.values(constents.challenges_flags.list).join(", ")}.`,
 
@@ -110,7 +111,7 @@ export const speeches = {
     ORG_CODE_REQUIRED: "Organization code is required.",
     ORG_CODE_NOT_EXISTS: "Organization code does not exists.",
     ORG_NAME_REQUIRED: "Organization name is required.",
-    
+
     PRINCIPAL_NAME_REQ: "principal name  is required.",
     PRINCIPAL_EMAIL_REQ: "principal email  is required.",
     PRINCIPAL_MOBILE_REQ: "principal mobile  is required.",
@@ -126,10 +127,10 @@ export const speeches = {
 
     TEACHER_OBJECT: "Teacher object required",
     STUDENT_OBJECT: "Student object required",
-    ROADMAP_FILE_CORRUPTED:"Roadmao file is corrupted, Please contact the administrator.",
-    BADGE_IDS_ARRAY_REQUIRED:"badge_ids or badge_slugs any one of these array are required",
-    VIDEO_STREAM_ID_REQUIRED:"Video stream id is required",
-    TYPE_INVALID:"Invalid Type",
-    TYPE_REQUIRED:"Type is required",
-    INVALID_DATA:"Invalid Data, please check validity of data in the payload."
+    ROADMAP_FILE_CORRUPTED: "Roadmao file is corrupted, Please contact the administrator.",
+    BADGE_IDS_ARRAY_REQUIRED: "badge_ids or badge_slugs any one of these array are required",
+    VIDEO_STREAM_ID_REQUIRED: "Video stream id is required",
+    TYPE_INVALID: "Invalid Type",
+    TYPE_REQUIRED: "Type is required",
+    INVALID_DATA: "Invalid Data, please check validity of data in the payload."
 }

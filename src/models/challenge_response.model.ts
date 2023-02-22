@@ -16,6 +16,8 @@ export class challenge_response extends Model<InferAttributes<challenge_response
     declare status: Enumerator;
     declare evaluation_status: Enumerator;
     declare rejected_reason: String;
+    declare final_result: Enumerator;
+    declare district: String;
     declare created_by: number;
     declare created_at: Date;
     declare updated_by: number;
@@ -37,6 +39,15 @@ challenge_response.init(
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true
+        },
+        final_result: {
+            type: DataTypes.ENUM(...Object.values(constents.final_result_flags.list)),
+            defaultValue: constents.final_result_flags.default,
+            allowNull: true,
+        },
+        district: {
+            type: DataTypes.STRING,
+            allowNull: true,
         },
         challenge_id: {
             type: DataTypes.INTEGER,
@@ -117,5 +128,3 @@ challenge_response.init(
         updatedAt: 'updated_at'
     }
 );
-
-//todo: add associations.. here 

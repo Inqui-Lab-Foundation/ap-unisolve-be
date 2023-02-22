@@ -27,31 +27,6 @@ export class user extends Model<InferAttributes<user>, InferCreationAttributes<u
         user.hasMany(notification, { sourceKey: 'notification_id', as: 'notifications' });
 
     }
-
-    // static toJSON(user: userAttributes) {
-    //     return {
-    //         user_id: user.user_id,
-    //         email: user.email,
-    //         password: user.password,
-    //         full_name: user.full_name,
-    //         image: user.image,
-    //         date_of_birth: user.date_of_birth,
-    //         mobile: user.mobile,
-    //         team_id: user.team_id,
-    //         org_name: user.org_name,
-    //         qualification: user.qualification,
-    //         stream: user.stream,
-    //         city: user.city,
-    //         district: user.district,
-    //         state: user.state,
-    //         country: user.country,
-    //         role: user.role,
-    //         is_loggedin: user.is_loggedin,
-    //         last_login: user.last_login,
-    //         status: user.status,
-    //         created_by: user.created_by,
-    //         updated_by: user.updated_by,
-    // }
 }
 
 user.init(

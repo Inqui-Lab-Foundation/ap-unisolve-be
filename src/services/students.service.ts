@@ -1,19 +1,18 @@
-import { badRequest, internal, notFound, unauthorized } from "boom";
-import { nextTick } from "process";
+import { badRequest, internal, notFound } from "boom";
 import { Op } from "sequelize";
+
 import db from "../utils/dbconnection.util";
-import { constents } from "../configs/constents.config";
 import { speeches } from "../configs/speeches.config";
-import { course_topic } from "../models/course_topic.model";
-import { reflective_quiz_question } from "../models/reflective_quiz_question.model";
-import { reflective_quiz_response } from "../models/reflective_quiz_response.model";
 import { student } from "../models/student.model";
 import BaseService from "./base.service";
-import CRUDService from "./crud.service";
 import DashboardService from "./dashboard.service";
 
 export default class StudentService extends BaseService{
-    
+    /**
+     * invoke get Team Members For UserId With Progress As Optional without stats
+     * @param student_user_id String  student_id
+     * @returns Object 
+     */
     async getTeamMembersForUserId(student_user_id:any){
         try{
             return await this.getTeamMembersForUserIdWithProgressAsOptional(student_user_id,false);
@@ -22,6 +21,15 @@ export default class StudentService extends BaseService{
         }
     }
 
+    /**
+     * student details and stats for specific student user 
+     * @param student_user_id string student_id
+     * @param showProgressAsWell boolean shows student stats by default true 
+     * @param addWhereClauseStatusPart boolean where classes
+     * @param whereClauseStatusPartLiteral boolean where classes for status
+     * @param showCurrUserAsWell boolean to show current user details
+     * @returns Object 
+     */
     async getTeamMembersForUserIdWithProgressAsOptional(student_user_id:any,
         showProgressAsWell=false,addWhereClauseStatusPart=false,whereClauseStatusPartLiteral="1=1",showCurrUserAsWell=true){
         try{
@@ -33,7 +41,6 @@ export default class StudentService extends BaseService{
             if(showProgressAsWell){
                 attrsToIncludeForProgress=[
                     [
-                        //todo:TODO:optimization:this can further be optimised interms of right now total over topics count remains same for all students ..but we are still querying this for all students 
                         db.literal(`(
                             ${serviceDashboard.getDbLieralForAllToipcsCount(addWhereClauseStatusPart,
                             whereClauseStatusPartLiteral)}
@@ -68,9 +75,6 @@ export default class StudentService extends BaseService{
                             )`),
                         "idea_submission"
                     ],
-                    // [
-                    //     { "certificate_status": 0 } // hardcoded for now, functionality yet to finalized
-                    // ]
                 ]
             }
             let whereClauseShowCurrUserPart = {}
@@ -119,6 +123,11 @@ export default class StudentService extends BaseService{
         }
     }
 
+    /**
+     * get team id for specific user
+     * @param student_user_id string student_id
+     * @returns object
+     */
     async getTeamIdForUserId(student_user_id:any){
         try{
             if(!student_user_id){
@@ -144,6 +153,11 @@ export default class StudentService extends BaseService{
             return err;
         }
     }
+    /**
+     * get badges for specific user
+     * @param student_user_id string student_id
+     * @returns object
+     */
     async getStudentBadges(student_user_id:any){
         try{
             
@@ -167,7 +181,6 @@ export default class StudentService extends BaseService{
             
             //@ts-ignore
             const studentBadgesString = studentResult.dataValues.badges;
-            
             const studentBadgesObj:any = JSON.parse(studentBadgesString);
             return studentBadgesObj
         }catch(err){

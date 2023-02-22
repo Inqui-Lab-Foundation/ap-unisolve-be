@@ -2,6 +2,14 @@ import { constents } from "../configs/constents.config";
 import logintodb from "./db_logger.util";
 import logger from "./logger";
 
+/**
+ * store the logs.
+ * @param flag type of Log sting
+ * @param message message string
+ * @param req Request object
+ * @param res Response object
+ * @deprecated
+ */
 export default async function logIt(flag: string, message: string, req: any= {}, res: any= {}): Promise<any> {
     // const logBody = {
     //     log_type: flag,

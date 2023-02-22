@@ -5,7 +5,6 @@ import db from '../utils/dbconnection.util';
 
 export class challenge extends Model<InferAttributes<challenge>, InferCreationAttributes<challenge>> {
     declare challenge_id: CreationOptional<number>;
-    // declare no_of_questions: number;
     declare name: string;
     declare status: Enumerator;
     declare created_by: number;
@@ -60,10 +59,6 @@ challenge.init(
             defaultValue: DataTypes.NOW,
             onUpdate: new Date().toLocaleString()
         }
-        // no_of_questions: {
-        //     type: Data Types.INTEGER,
-        //     allowNull: false
-        // }
     },
     {
         sequelize: db,

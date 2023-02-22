@@ -39,6 +39,8 @@ export default class ReportController extends BaseController {
         this.router.get(this.path + "/notRegister", this.notRegistered.bind(this));
         this.router.get(this.path + "/userTopicProgress", this.userTopicProgressGroupByCourseTopicId.bind(this));
         this.router.get(this.path + "/mentorTeamsStudents", this.teamRegistered.bind(this));
+        this.router.get(this.path + "/challengesCount", this.challengesLevelCount.bind(this));
+        this.router.get(this.path + "/challengesDistrictCount", this.districtWiseChallengesCount.bind(this));
         // super.initializeRoutes();
     }
 
@@ -362,6 +364,82 @@ export default class ReportController extends BaseController {
                 throw teamResult
             }
             res.status(200).send(dispatcher(res, teamResult, "success"))
+        } catch (err) {
+            next(err)
+        }
+    }
+    protected async challengesLevelCount(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            const { quiz_survey_id } = req.params
+            const { page, size, role } = req.query;
+            let condition = role ? { role: { [Op.eq]: role } } : null;
+            const { limit, offset } = this.getPagination(page, size);
+            const modelClass = await this.loadModel(this.model).catch(error => {
+                next(error)
+            });
+            const paramStatus: any = req.query.status;
+            let whereClauseStatusPart: any = {};
+            let whereClauseStatusPartLiteral = "1=1";
+            let addWhereClauseStatusPart = false
+            if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
+                if (paramStatus === 'ALL') {
+                    whereClauseStatusPart = {};
+                    addWhereClauseStatusPart = false;
+                } else {
+                    whereClauseStatusPart = { "status": paramStatus };
+                    addWhereClauseStatusPart = true;
+                }
+            } else {
+                whereClauseStatusPart = { "status": "ACTIVE" };
+                addWhereClauseStatusPart = true;
+            }
+            const challengesLevels = await db.query("select status, evaluation_status, count(team_id) AS team_count from challenge_responses group by status, evaluation_status", { type: QueryTypes.SELECT });
+            if (!challengesLevels) {
+                throw notFound(speeches.DATA_NOT_FOUND)
+            }
+            if (challengesLevels instanceof Error) {
+                throw challengesLevels
+            }
+            res.status(200).send(dispatcher(res, challengesLevels, "success"))
+        } catch (err) {
+            next(err)
+        }
+    }
+    protected async districtWiseChallengesCount(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            let challenges: any
+            let level = req.query.level;
+            if (level && typeof level == 'string') {
+                switch (level) {
+                    case 'DRAFT': challenges = await db.query("SELECT district, count(challenge_response_id) as count FROM unisolve_db.challenge_responses WHERE status = 'DRAFT' group by district", { type: QueryTypes.SELECT });
+                        break;
+                    case 'SUBMITTED': challenges = await db.query("SELECT district, count(challenge_response_id) as count FROM unisolve_db.challenge_responses WHERE status = 'SUBMITTED' group by district", { type: QueryTypes.SELECT });
+                        break;
+                    case 'L1YETPROCESSED': challenges = await db.query("SELECT count(challenge_response_id) as count, district FROM unisolve_db.challenge_responses WHERE evaluation_status is null group by district ", { type: QueryTypes.SELECT });
+                        break;
+                    case 'SELECTEDROUND1': challenges = await db.query("SELECT count(challenge_response_id) as count, district FROM unisolve_db.challenge_responses WHERE evaluation_status = 'SELECTEDROUND1' group by district", { type: QueryTypes.SELECT });
+                        break;
+                    case 'REJECTEDROUND1': challenges = await db.query("SELECT count(challenge_response_id) as count, district FROM unisolve_db.challenge_responses WHERE evaluation_status = 'REJECTEDROUND1' group by district ", { type: QueryTypes.SELECT });
+                        break;
+                    case 'L2PROCESSED': challenges = await db.query("SELECT COUNT(challenge_response_id) AS count, district FROM unisolve_db.challenge_responses WHERE challenge_response_id IN(SELECT challenge_response_id FROM unisolve_db.evaluator_ratings GROUP BY challenge_response_id HAVING COUNT(challenge_response_id) > 2) GROUP BY district", { type: QueryTypes.SELECT });
+                        break;
+                    case 'L2YETPROCESSED': challenges = await db.query("SELECT count(challenge_response_id) as count, district FROM unisolve_db.l1_accepted group by district; ", { type: QueryTypes.SELECT });
+                        break;
+                    case 'FINALCHALLENGES': challenges = await db.query("SELECT district, COUNT(challenge_response_id) AS count FROM unisolve_db.challenge_responses WHERE challenge_response_id in (SELECT challenge_response_id FROM unisolve_db.evaluation_results);", { type: QueryTypes.SELECT });
+                        break;
+                    case 'FINALACCEPTED': challenges = await db.query("SELECT district, count(challenge_response_id) as count FROM unisolve_db.challenge_responses WHERE final_result = '1' group by district ", { type: QueryTypes.SELECT });
+                        break;
+                    case 'FINALREJECTED': challenges = await db.query("SELECT district, count(challenge_response_id) as count FROM unisolve_db.challenge_responses WHERE final_result = '0' group by district ", { type: QueryTypes.SELECT });
+                        break;
+                }
+            }
+            if (!challenges) {
+                throw notFound(speeches.DATA_NOT_FOUND)
+            }
+            if (challenges instanceof Error) {
+                throw challenges
+            }
+            res.status(200).send(dispatcher(res, challenges, "success"))
         } catch (err) {
             next(err)
         }

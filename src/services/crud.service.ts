@@ -1,4 +1,10 @@
 export default class CRUDService {
+    /**
+     * Help create entire  from the database
+     * @param model String tables name
+     * @param input object data to be inserted 
+     * @returns object
+     */
     async create(model: any, input: any) {
         try {
             const data = await model.create({ ...input });
@@ -10,6 +16,12 @@ export default class CRUDService {
             return error;
         }
     };
+    /**
+     * Help create entire  from the database bulk
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async bulkCreate(model: any, input: any) {
         try {
             const data = await model.bulkCreate(input);
@@ -18,6 +30,12 @@ export default class CRUDService {
             return error;
         }
     };
+    /**
+     *  Help finding entire  from the database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findOne(model: any, query: object) {
         try {
             const data = await model.findOne(query);
@@ -29,6 +47,12 @@ export default class CRUDService {
             return error;
         }
     };
+    /**
+     *  Help finding entire from the database with password
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findOnePassword(model: any, query: object) {
         try {
             const data = await model.findOne(query);
@@ -38,6 +62,12 @@ export default class CRUDService {
             return error.message;
         }
     };
+    /**
+     *  Help finding all entires from the database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findAll(model: any, query?: object) {
         try {
             const data = await model.findAll(query);
@@ -50,6 +80,12 @@ export default class CRUDService {
             return error;
         }
     };
+    /**
+     *  Help finding all entires and count from the database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findAndCountAll(model: any, input: object) {
         try {
             const data = await model.findAndCountAll(input);
@@ -59,6 +95,12 @@ export default class CRUDService {
             return error;
         }
     };
+    /**
+     *  Help finding by the primary key from database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findByPk(model: any, input: string) {
         try {
             return await model.findByPk(input);
@@ -66,7 +108,12 @@ export default class CRUDService {
             return error;
         }
     };
-
+    /**
+     *  Help finding by the where from the database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async findWhere(model: any, query: object, order: object = []) {
         try {
             return await model.findAll({ logging: console.log, where: query, order: order });
@@ -74,7 +121,12 @@ export default class CRUDService {
             return error;
         }
     };
-
+    /**
+     *  Help finding the entries and update from the database
+     * @param model String tables name
+     * @param input  object data to be inserted 
+     * @returns object
+     */
     async updateAndFind(model: any, update: object, query: object) {
         try {
             await this.update(model, update, query);
@@ -92,21 +144,26 @@ export default class CRUDService {
             return error;
         }
     }
-
+    /**
+         *  Help updating entries and update from the database
+         * @param model String tables name
+         * @param input  object data to be inserted 
+         * @returns object
+         */
     async update(model: any, update: object, query: object) {
         try {
-
             const data = await model.update(update, query);
-            // console.log(data)
-            // if (data) {
-            //     delete data.dataValues.password;
-            // }
             return data;
         } catch (error: any) {
-            // console.log(error)
             return error;
         }
     };
+    /**
+         *  Help deleting entries and update from the database
+         * @param model String tables name
+         * @param input  object data to be inserted 
+         * @returns object
+         */
     async delete(model: any, query: object) {
         try {
             return await model.destroy(query);
@@ -114,7 +171,4 @@ export default class CRUDService {
             return error;
         }
     };
-    // async createCourse(model: any, body: object) {
-
-    // }
 }

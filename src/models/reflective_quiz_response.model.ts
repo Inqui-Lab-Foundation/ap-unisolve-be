@@ -1,8 +1,6 @@
 import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { constents } from '../configs/constents.config';
-import questionAttribute from '../interfaces/question.model.interface';
 import db from '../utils/dbconnection.util';
-import { quiz } from './quiz.model';
 
 export class reflective_quiz_response extends Model<InferAttributes<reflective_quiz_response>, InferCreationAttributes<reflective_quiz_response>> {
     declare reflective_quiz_response_id: CreationOptional<number>;
@@ -79,5 +77,3 @@ reflective_quiz_response.init(
         updatedAt: 'updated_at'
     }
 );
-
-//todo: add associations.. here 

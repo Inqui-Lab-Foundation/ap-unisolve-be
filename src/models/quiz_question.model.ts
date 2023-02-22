@@ -1,6 +1,5 @@
 import { CreationOptional, DataTypes, ForeignKey, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { constents } from '../configs/constents.config';
-import questionAttribute from '../interfaces/question.model.interface';
 import db from '../utils/dbconnection.util';
 import { quiz } from './quiz.model';
 
@@ -41,13 +40,6 @@ export class quiz_question extends Model<InferAttributes<quiz_question>, InferCr
     //     // define association here
     //     notification.belongsTo(user, { foreignKey: 'created_by', as: 'user' });
     // }
-
-    // ar_image_ans_correct
-    // ar_video_ans_correct
-    // accimg_ans_correct
-    // ar_image_ans_wrong
-    // ar_video_ans_wrong
-    // accimg_ans_wrong
 }
 
 quiz_question.init(

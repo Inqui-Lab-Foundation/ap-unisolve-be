@@ -132,21 +132,24 @@ export default class SupportTicketController extends BaseController {
             next(error);
         }
     };
-
     protected async updateData(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
         try {
             const { model, id } = req.params;
             if (model) {
                 this.model = model;
             };
-            const user_id = res.locals.user_id
             const where: any = {};
-            where[`${this.model}_id`] = req.params.id;
+            const user_id = res.locals.user_id
             const modelLoaded = await this.loadModel(model);
-            const payload = this.autoFillTrackingColumns(req, res, modelLoaded)
+            let payload: any = req.body;
+            payload['updated_by'] = user_id;
+            where[`${this.model}_id`] = id;
             const data = await this.crudService.update(modelLoaded, payload, { where: where });
-            if (!data || data instanceof Error) {
-                throw badRequest(data.message)
+            if (!data) {
+                throw badRequest()
+            }
+            if (data instanceof Error) {
+                throw data;
             }
             return res.status(200).send(dispatcher(res, data, 'updated'));
         } catch (error) {

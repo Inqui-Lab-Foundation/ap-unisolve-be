@@ -1,15 +1,18 @@
-import { DataBrew } from "aws-sdk";
-import { required } from "joi";
 import { Op } from "sequelize";
 import { constents } from "../configs/constents.config";
-import { mentor } from "../models/mentor.model";
-import { mentor_topic_progress } from "../models/mentor_topic_progress.model";
-import { quiz_survey_response } from "../models/quiz_survey_response.model";
 import BaseService from "./base.service";
-import db from "../utils/dbconnection.util"
-import { organization } from "../models/organization.model";
+import db from "../utils/dbconnection.util";
 export default class ReportService extends BaseService{
-    
+    /**
+     * fetch Org Codes To include All Mentor Report Based On Report Status Param
+     * @param tr String attribute to include organization code for mentor who registered more then once
+     * @param tpre String attribute to include quiz quiz_survey_response 
+     * @param tc String
+     * @param tpost String
+     * @param rs String
+     * @param totalNoOfTopics String totalNoOfTopics 
+     * @returns where clause object with with selected attributes
+     */
     async fetchOrgCodeArrToIncInAllMentorReportBasedOnReportStatusParam(
         tr:any,
         tpre:any,
@@ -24,13 +27,12 @@ export default class ReportService extends BaseService{
             if(!rs || rs=="ALL"){
                 return resultWherClause
             }
-            //switch case begins....!! entire busines logic is here 
-            //where rs param changes its aligance based on the params given with higest weightage given to 
-            // tpost , then tc, then tpre and then tr and the way to fetch the params is diff for each ...!!
+            /**
+             * @note  switch case begins....!! entire business logic is here, where rs param changes its Alliance based on the params given with highest weighage given to, tpost , then tc, then tpre and then tr and the way to fetch the params is diff for each ...!!
+             */
             if(tpost){
                 if(rs=="INPROGRESS" || 
                 !(rs in constents.reports_all_ment_reports_rs_flags.list)){
-                    //return as is 
                     return resultWherClause
                 }
                 
@@ -44,7 +46,6 @@ export default class ReportService extends BaseService{
                 
             }else if(tc){
                 if(!(rs in constents.reports_all_ment_reports_rs_flags.list)){
-                    //return as is 
                     return resultWherClause
                 }
                 if(rs=="COMPLETED" ){
@@ -76,7 +77,6 @@ export default class ReportService extends BaseService{
             }else if(tpre){
                 if(rs=="INPROGRESS" || 
                 !(rs in constents.reports_all_ment_reports_rs_flags.list)){
-                    //return as is 
                     return resultWherClause
                 }
                 [resultOrgCodeArr,meta] = await db.query(`
@@ -98,8 +98,6 @@ export default class ReportService extends BaseService{
             }else{
                 return resultWherClause
             }
-            // console.log("resultOrgCodeArr",resultOrgCodeArr)
-            //status in not in....!!
             if(rs == constents.reports_all_ment_reports_rs_flags.list["COMPLETED"] ||
                 rs == constents.reports_all_ment_reports_rs_flags.list["INPROGRESS"]){
                 resultWherClause = {
@@ -119,5 +117,4 @@ export default class ReportService extends BaseService{
             return err
         }
     }
-
 }

@@ -1,5 +1,6 @@
 import { Sequelize } from 'sequelize';
 
+// database connection.
 const database = new Sequelize(
     process.env.DB_NAME || '',
     process.env.DB_USER || '',
@@ -7,6 +8,7 @@ const database = new Sequelize(
     {
         host: process.env.DB_HOST,
         dialect: 'mysql',
+        //next two line help in debugging
         // logging: console.log,
         // logQueryParameters: true,
         logging: false,

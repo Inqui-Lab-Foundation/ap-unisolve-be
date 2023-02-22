@@ -25,7 +25,7 @@ export class instructions extends Model<InferAttributes<instructions>, InferCrea
             allowNull: true
         },
         instructions: {
-            type: DataTypes.STRING,
+            type: DataTypes.TEXT('long'),
             allowNull: true
         },
         status: {

@@ -20,6 +20,7 @@ import { student } from '../models/student.model';
 import { team } from '../models/team.model';
 import { challenge_response } from '../models/challenge_response.model';
 import StudentService from '../services/students.service';
+import { user } from '../models/user.model';
 
 
 export default class DashboardController extends BaseController {
@@ -55,6 +56,8 @@ export default class DashboardController extends BaseController {
 
         //evaluator stats..
         this.router.get(`${this.path}/evaluatorStats`, this.getEvaluatorStats.bind(this));
+        //loggedInUserCount
+        this.router.get(`${this.path}/loggedInUserCount`, this.getLoggedInUserCount.bind(this));
 
         super.initializeRoutes();
     }
@@ -610,10 +613,13 @@ export default class DashboardController extends BaseController {
             const submitted_count = await db.query("SELECT count(challenge_response_id) as 'submitted_count' FROM challenge_responses where status = 'SUBMITTED'", { type: QueryTypes.SELECT });
             const selected_round_one_count = await db.query("SELECT count(challenge_response_id) as 'selected_round_one_count' FROM challenge_responses where evaluation_status = 'SELECTEDROUND1'", { type: QueryTypes.SELECT });
             const rejected_round_one_count = await db.query("SELECT count(challenge_response_id) as 'rejected_round_one_count' FROM challenge_responses where evaluation_status = 'REJECTEDROUND1'", { type: QueryTypes.SELECT });
-            console.log(submitted_count, selected_round_one_count, rejected_round_one_count);
-            if (!submitted_count || !rejected_round_one_count || !selected_round_one_count) {
-                throw notFound(speeches.DATA_NOT_FOUND)
-            }
+            const l2_yet_to_processed = await db.query("SELECT COUNT(*) AS l2_yet_to_processed FROM l1_accepted;", { type: QueryTypes.SELECT });
+            const l2_processed = await db.query("SELECT challenge_response_id, count(challenge_response_id) AS l2_processed FROM unisolve_db.evaluator_ratings group by challenge_response_id HAVING COUNT(challenge_response_id) > 2", { type: QueryTypes.SELECT });
+            const draft_count = await db.query("SELECT count(challenge_response_id) as 'draft_count' FROM challenge_responses where status = 'DRAFT'", { type: QueryTypes.SELECT });
+            const final_challenges = await db.query("SELECT count(challenge_response_id) as 'final_challenges' FROM evaluation_results where status = 'ACTIVE'", { type: QueryTypes.SELECT });
+            const l1_yet_to_process = await db.query(`SELECT COUNT(challenge_response_id) AS l1YetToProcess FROM unisolve_db.challenge_responses WHERE status = 'SUBMITTED' AND evaluation_status is NULL OR evaluation_status = ''`, { type: QueryTypes.SELECT });
+            const final_evaluation_challenge = await db.query(`SELECT COUNT(challenge_response_id) FROM unisolve_db.challenge_responses WHERE final_result = '0'`, { type: QueryTypes.SELECT });
+            const final_evaluation_final = await db.query(`SELECT COUNT(challenge_response_id) FROM unisolve_db.challenge_responses WHERE final_result = '1'`, { type: QueryTypes.SELECT });
             if (submitted_count instanceof Error) {
                 throw submitted_count
             }
@@ -623,9 +629,72 @@ export default class DashboardController extends BaseController {
             if (rejected_round_one_count instanceof Error) {
                 throw rejected_round_one_count
             };
+            if (l2_yet_to_processed instanceof Error) {
+                throw l2_yet_to_processed
+            };
+            if (l2_processed instanceof Error) {
+                throw l2_processed
+            };
+            if (draft_count instanceof Error) {
+                throw draft_count
+            };
+            if (final_challenges instanceof Error) {
+                throw final_challenges
+            };
+            if (l1_yet_to_process instanceof Error) {
+                throw l1_yet_to_process
+            };
+            if (final_evaluation_challenge instanceof Error) {
+                throw final_evaluation_challenge
+            };
+            if (final_evaluation_final instanceof Error) {
+                throw final_evaluation_final
+            };
+            response['draft_count'] = Object.values(draft_count[0]).toString();
             response['submitted_count'] = Object.values(submitted_count[0]).toString()
+            response['l1_yet_to_process'] = Object.values(l1_yet_to_process[0]).toString();
             response['selected_round_one_count'] = Object.values(selected_round_one_count[0]).toString()
             response["rejected_round_one_count"] = Object.values(rejected_round_one_count[0]).toString()
+            response["l2_processed"] = (l2_processed.length).toString()
+            response["l2_yet_to_processed"] = Object.values(l2_yet_to_processed[0]).toString()
+            response['final_challenges'] = Object.values(final_challenges[0]).toString();
+            response['final_evaluation_challenge'] = Object.values(final_evaluation_challenge[0]).toString();
+            response['final_evaluation_final'] = Object.values(final_evaluation_final[0]).toString();
+            res.status(200).send(dispatcher(res, response, "success"))
+        } catch (err) {
+            next(err)
+        }
+    }
+
+    //loggedUserCount
+    protected async getLoggedInUserCount(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            let response: any;
+            const paramStatus: any = req.query.status;
+            // let  timer: any = req.body.time;
+            let whereClauseStatusPart: any = {};
+            let whereClauseStatusPartLiteral = "1=1";
+            let addWhereClauseStatusPart = false
+            if (paramStatus && (paramStatus in constents.common_status_flags.list)) {
+                whereClauseStatusPart = { "status": paramStatus }
+                whereClauseStatusPartLiteral = `status = "${paramStatus}"`
+                addWhereClauseStatusPart = true;
+            }
+            // timer = new Date(timer);
+            // const modifiedTime: any = timer.setSeconds(timer.getSeconds() + 5);
+            response = await this.crudService.findAndCountAll(user, {
+                attributes: [
+                    "username",
+                    "full_name"
+                ],
+                where: {
+                    [Op.and]: [
+                        { is_loggedin: 'YES' },
+                        { role: 'STUDENT' },
+                        // { last_login: { [Op.between]: [req.body.time, modifiedTime] } }
+                    ]
+                }
+            })
             res.status(200).send(dispatcher(res, response, "success"))
         } catch (err) {
             next(err)

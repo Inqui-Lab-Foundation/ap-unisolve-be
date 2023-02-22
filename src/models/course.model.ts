@@ -23,7 +23,6 @@ export class course extends Model<courseAttributes> {
      * The `models/index` file will call this method automatically.
      */
     static associate(models: any) {
-        // console.log("came here");
         // define association here
         course.hasMany(models, { foreignKey: 'course_id', as: 'courseModules' });
     }
@@ -85,4 +84,3 @@ course.init(
         createdAt: 'created_at',
     }
 );
-//course.associate(course_module);

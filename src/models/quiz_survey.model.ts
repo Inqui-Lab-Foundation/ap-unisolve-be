@@ -1,6 +1,5 @@
 import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
 import { constents } from '../configs/constents.config';
-import quizAttribute from '../interfaces/quiz.model.interface';
 import db from '../utils/dbconnection.util';
 
 export class quiz_survey extends Model<InferAttributes<quiz_survey>,InferCreationAttributes<quiz_survey>> {

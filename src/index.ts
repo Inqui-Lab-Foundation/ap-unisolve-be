@@ -3,7 +3,6 @@ import validateEnv from "./utils/validate_env";
 import App from "./app";
 
 import AuthController from "./controllers/auth.controller";
-// import CRUDController from "./controllers/crud.controller"; // (Disabling CRUD API's for directly use)
 import NotificationsController from "./controllers/notifications.controller";
 import CourseController from "./controllers/course.controller";
 import VideoController from "./controllers/video.controller";
@@ -15,7 +14,6 @@ import UserTopicProgress from "./controllers/userTopicProgress.controller";
 import QuizController from "./controllers/quiz.controller";
 import FaqCategoryController from "./controllers/faq_category.controller";
 import FaqController from "./controllers/faq.controller";
-
 import OrganizationController from "./controllers/organization.controller";
 import ReflectiveQuizController from "./controllers/reflective_quiz.controller";
 import MentorController from "./controllers/mentor.controller";
@@ -38,16 +36,16 @@ import TutorialVideoController from "./controllers/tutorial_video.controller";
 import ReportController from "./controllers/report.controller";
 import CertificateDownloadController from "./controllers/ceritificate_download.controller";
 import ChallengeResponsesController from "./controllers/challenge_response.controller";
+import EvaluatorRatingController from "./controllers/evaluator_rating.controller";
 import InstructionController from "./controllers/instructions.controller";
 import EvaluationProcess from "./controllers/evaluation_process.controller";
 
 // validating env variables
 validateEnv();
 
-// initializing app
 try {
+    // initializing app
     const app = new App([
-        // new CRUDController (Disabling CRUD API's for directly use)
         new AuthController,
         new NotificationsController,
         new CourseController,
@@ -83,8 +81,9 @@ try {
         new TutorialVideoController,
         new ReportController,
         new CertificateDownloadController,
+        new EvaluatorRatingController,
         new InstructionController,
-        new EvaluationProcess
+        new EvaluationProcess,
     ], Number(process.env.APP_PORT));
     // starting app
     app.listen();

@@ -1,7 +1,7 @@
 ![](https://codebuild.ap-south-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoibngrZm9wOWpSTzVmMDc2b04vaWM2MnJZallaWHBReUIyQVhDNi9wZDNHUGk0a1UrYVllNnVHQm5FMzkyUXMrN2Qyd2h4ekRSdHhCYTRmSFVGRVViVXUwPSIsIml2UGFyYW1ldGVyU3BlYyI6InpVeDR2dkU4dnZ2V0JaMkQiLCJtYXRlcmlhbFNldFNlcmlhbCI6Mn0%3D&branch=develop)
 # Student's Learning Platform backend
 
-# UNISLOVE-BE
+# UNISLOVE-Back End
 
 Unislove backend containing All list API's and server hosted in port <3002>
 

@@ -66,5 +66,3 @@ team.belongsTo(mentor, { foreignKey: 'mentor_id', constraints: false });
 mentor.hasOne(team, { foreignKey: 'mentor_id', constraints: false });
 challenge_response.belongsTo(team, { foreignKey: 'team_id', constraints: false });
 team.hasMany(challenge_response, { foreignKey: 'team_id', constraints: false });
-// mentor.belongsTo(organization, { targetKey: 'organization_code',foreignKey: 'organization_code', constraints: false });
-// organization.hasOne(mentor, { sourceKey:'organization_code',foreignKey: 'organization_code', constraints: false});

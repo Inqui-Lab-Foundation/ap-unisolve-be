@@ -6,7 +6,6 @@ import { notification } from './notification.model';
 import { baseConfig } from '../configs/base.config';
 import { user } from './user.model';
 import { organization } from './organization.model';
-import { speeches } from '../configs/speeches.config';
 import { student } from './student.model';
 
 

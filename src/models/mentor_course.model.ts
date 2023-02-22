@@ -1,8 +1,6 @@
 import {Association, CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model} from 'sequelize';
 import { constents } from '../configs/constents.config';
 import db from '../utils/dbconnection.util';
-import { course_module } from './course_module.model';
-
 
 
 export class mentor_course extends Model<InferAttributes<mentor_course>,InferCreationAttributes<mentor_course>> {
@@ -21,7 +19,6 @@ export class mentor_course extends Model<InferAttributes<mentor_course>,InferCre
      * The `models/index` file will call this method automatically.
      */
     static associate(models: any) {
-        // console.log("came here");
         // define association here
 
     }

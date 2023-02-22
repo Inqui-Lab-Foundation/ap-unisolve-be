@@ -4,7 +4,6 @@
 import { NextFunction, Request,RequestHandler,Response } from "express";
 import { constents } from "../configs/constents.config";
 import TranslationService from "../services/translation.service";
-import TranslationsProvider from "../utils/translations/translationProvider";
 
 // then restores the original send function and invokes that to finalize the req/res chain
 export const resSendInterceptor = (res:Response, send:any) => (content:any) => {

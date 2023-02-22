@@ -88,11 +88,6 @@ badge.init(
                     argBadge.slug = badge.getSlugValue(argBadge.name);
                 }
             },
-            // beforeUpdate: async (user) => {
-            //     if (user.password) {
-            //         user.password = await bcrypt.hashSync(user.password, process.env.SALT || baseConfig.SALT);
-            //     }
-            // }
         }
     }
 );

@@ -1,4 +1,3 @@
-import { illegal } from "boom";
 import { constents } from "../../configs/constents.config";
 import { translation } from "../../models/translation.model";
 import { speeches_en } from "./locales/en";

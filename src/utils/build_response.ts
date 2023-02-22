@@ -2,9 +2,8 @@ import HttpStatus from 'http-status-codes';
 
 /**
  * Build error response for validation errors.
- *
- * @param   {Error} err
- * @returns {Object}
+ * @param  {Error} err
+ * @returns {Object} modified response
  */
 function buildResponse(dataValue:any) {
     return {

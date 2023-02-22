@@ -1,9 +1,9 @@
-
 import { worksheetSchema, worksheetUpdateSchema } from "../validations/worksheet.validations";
 import ValidationsHolder from "../validations/validationHolder";
 import BaseController from "./base.controller";
 import { NextFunction, Request, Response } from "express";
 import { badRequest, internal, notFound, unauthorized } from "boom";
+import { S3 } from "aws-sdk";
 import { speeches } from "../configs/speeches.config";
 import path from "path";
 import fs from 'fs';
@@ -184,45 +184,74 @@ export default class WorksheetController extends BaseController {
             if(!curr_workshet_topic || curr_workshet_topic instanceof Error){
                 throw badRequest("INVALID TOPIC");
             }
-
+            let s3 = new S3({
+                apiVersion: '2006-03-01',
+                region: process.env.AWS_REGION,
+                accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+                secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+            });
             //copy attached file in assets/worksheets/responses and add its path in attachment variable
             const rawfiles: any = req.files;
             const files: any = Object.values(rawfiles);
             const file_key: any = Object.keys(rawfiles);
             const reqData: any = req.body;
             const errs: any = [];
-            let attachments = "";
+            let result: any = {};
+            let attachments: any = [];
+            let file_name_prefix: any;
+            if (process.env.NODE_ENV == "prod") {
+                file_name_prefix = `mldv_worksheets`
+            } else {
+                file_name_prefix = `mldv_worksheets/stage`
+            }
             for (const file_name of Object.keys(files)) {
                 const file = files[file_name];
                 let filename = file.path.split(path.sep).pop();
                 // filename = ""+Date.now()+"_"+filename
-                filename = "user_id_"+user_id+"_worksheet_id_"+worksheet_id+"_"+filename
-                const targetPath = path.join(process.cwd(), 'resources', 'static', 'uploads', 'worksheets' ,'responses', filename);
-                const copyResult:any = await fs.promises.copyFile(file.path, targetPath).catch(err=>{
-                    errs.push(`Error uploading file: ${file.originalFilename}`);
-                })
-                if(copyResult instanceof Error) {
-                        errs.push(`Error uploading file: ${file.originalFilename}`);
-                        // console.log(copyResult)
-                        // throw internal(`Error uploading file: ${file.originalFilename}`) 
-                        // next(internal(`Error uploading file: ${file.originalFilename}`))  
-                } else {
-                        
-                    reqData[file.fieldName] = `/assets/worksheets/responses/${filename}`;
-                    attachments  = attachments+`/assets/worksheets/responses/${filename},`
-                    // console.log(attachments)
+                filename = "user_id_" + user_id + "_worksheet_id_" + worksheet_id
+                const readFile: any = await fs.readFileSync(file.path);
+                if (readFile instanceof Error) {
+                    errs.push(`Error uploading file: ${file.originalFilename} err: ${readFile}`)
                 }
+                file.originalFilename = `${file_name_prefix}/${filename}/${file.originalFilename}`;
+                let params = {
+                    Bucket: 'unisole-assets',
+                    Key: file.originalFilename,
+                    Body: readFile
+                };
+                let options: any = { partSize: 20 * 1024 * 1024, queueSize: 2 };
+                await s3.upload(params).promise()
+                    .then((data: any) => { attachments.push(data.Location) })
+                    .catch((err: any) => { errs.push(`Error uploading file: ${file.originalFilename}, err: ${err.message}`) })
+                result['attachments'] = attachments;
+                result['errors'] = errs;
             }
-            if (errs.length) {
-                return res.status(406).send(dispatcher(res,errs, 'error', speeches.NOT_ACCEPTABLE, 406));
-            }
+            // res.status(200).send(dispatcher(res, result));
+            // const targetPath = path.join(process.cwd(), 'resources', 'static', 'uploads', 'worksheets', 'responses', filename);
+            // const copyResult: any = await fs.promises.copyFile(file.path, targetPath).catch(err => {
+            //     errs.push(`Error uploading file: ${file.originalFilename}`);
+            // })
+            // if (copyResult instanceof Error) {
+            //     errs.push(`Error uploading file: ${file.originalFilename}`);
+            //     // console.log(copyResult)
+            //     // throw internal(`Error uploading file: ${file.originalFilename}`) 
+            //     // next(internal(`Error uploading file: ${file.originalFilename}`))  
+            // } else {
 
+            //     reqData[file.fieldName] = `/assets/worksheets/responses/${filename}`;
+            //     attachments = attachments + `/assets/worksheets/responses/${filename},`
+            //     // console.log(attachments)
+            // }
+            // }
+            // if (errs.length) {
+            //     return res.status(406).send(dispatcher(res, errs, 'error', speeches.NOT_ACCEPTABLE, 406));
+            // }
             const modelLoaded = await this.loadModel("worksheet_response");
             //create an entry in worksheet submission table
             let dataToBeUploaded:any = {};
             dataToBeUploaded["worksheet_id"]= worksheet_id
             dataToBeUploaded["user_id"] = user_id
-            dataToBeUploaded["attachments"]= attachments
+            dataToBeUploaded["attachments"] = attachments.toString()
             const payload = this.autoFillTrackingColumns(req, res, modelLoaded, dataToBeUploaded)
             const data = await this.crudService.create(modelLoaded, payload);
 

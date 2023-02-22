@@ -416,6 +416,19 @@ export default class StudentController extends BaseController {
                 result.data['mentor_id'] = teamDetails.dataValues.mentor_id;
                 result.data['team_name'] = teamDetails.dataValues.team_name;
             }
+            const mentorData = await this.authService.crudService.findOne(mentor, {
+                where: { mentor_id: teamDetails.dataValues.mentor_id },
+                include: {
+                    model: organization
+                }
+            });
+            if (!mentorData || mentorData instanceof Error) {
+                return res.status(404).send(dispatcher(res, null, 'error', speeches.USER_REG_STATUS));
+            }
+            if (mentorData.dataValues.reg_status !== '3') {
+                return res.status(404).send(dispatcher(res, null, 'error', speeches.USER_REG_STATUS));
+            }
+            result.data['organization_name'] = mentorData.dataValues.organization.organization_name;
             return res.status(200).send(dispatcher(res, result.data, 'success', speeches.USER_LOGIN_SUCCESS));
         }
     }

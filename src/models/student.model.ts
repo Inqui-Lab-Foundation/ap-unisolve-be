@@ -1,13 +1,10 @@
-import { DataTypes, Model, Attributes, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
+import { DataTypes, Model, InferAttributes, InferCreationAttributes, CreationOptional } from 'sequelize';
 import bcrypt from 'bcrypt';
 import { constents } from '../configs/constents.config';
 import db from '../utils/dbconnection.util';
 import { notification } from './notification.model';
 import { baseConfig } from '../configs/base.config';
 import { user } from './user.model';
-import { admin } from './admin.model';
-import { mentor } from './mentor.model';
-import { team } from './team.model';
 
 export class student extends Model<InferAttributes<student>, InferCreationAttributes<student>> {
     declare student_id: CreationOptional<number>;

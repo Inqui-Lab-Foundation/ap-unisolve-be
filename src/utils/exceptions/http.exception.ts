@@ -1,3 +1,9 @@
+/**
+ * used to build the error message;
+ * @param status Number
+ * @param message String
+ * @param data Object
+ */
 export default class HttpException extends Error {
     public status: number;
     public message: string;

@@ -24,6 +24,7 @@ describe("API - CRUD", () => {
         "qualification": "b.com",
         "created_by": 1236547899
     }
+    // "return 201 create entry click
     test("return 201 create entry", async () => {
         const response = await request(app.app).post('/api/v1/crud/user').set("Authorization", `Bearer ${token}`).send(payload);
         expect(response.statusCode).toBe(201);

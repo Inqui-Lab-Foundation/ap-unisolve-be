@@ -1,6 +1,9 @@
 import { cleanEnv, str, port} from "envalid"; 
 import { baseConfig } from "../configs/base.config";
 
+/**
+ * validates the env variables with the help envValid 
+ */
 export default function validateEnv(): void {
     cleanEnv(process.env, {
         NODE_ENV: str({

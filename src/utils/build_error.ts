@@ -7,9 +7,8 @@ import HttpException from './exceptions/http.exception';
 
 /**
  * Build error response for validation errors.
- *
- * @param   {Error} err
- * @returns {Object}
+ * @param  {Error} error
+ * @returns {Object} modified error
  */
 export default function buildError(err:any) {
   // Validation errors

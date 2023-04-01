@@ -54,6 +54,7 @@ export default class ChallengeResponsesController extends BaseController {
         this.router.get(`${this.path}/districtWiseRating/`, this.districtWiseRating.bind(this));
         this.router.get(`${this.path}/evaluationResult/`, this.evaluationResult.bind(this));
         this.router.get(`${this.path}/finalEvaluation/`, this.finalEvaluation.bind(this));
+        this.router.get(this.path + '/evaluatedIdeas', this.getEvaluatorDetailsForEvaluatedIdeas.bind(this));
         super.initializeRoutes();
     }
 
@@ -688,6 +689,80 @@ export default class ChallengeResponsesController extends BaseController {
             return err;
         }
 
+    }
+    protected async getEvaluatorDetailsForEvaluatedIdeas(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            let response: any;
+            let attributesNeedFetch: any;
+
+            let user_id = res.locals.user_id;
+            if (!user_id) throw unauthorized(speeches.UNAUTHORIZED_ACCESS);
+            
+            let level = req.query.level;
+
+            if (level && typeof level == 'string') {
+                switch (level) {
+                    case 'L1':
+                        attributesNeedFetch = [
+                            [
+                                db.literal(`(SELECT full_name FROM users as u where u.user_id = \`challenge_response\`.\`evaluated_by\` )`), 'full_name'
+                            ],
+                            [
+                                db.literal(`(SELECT mobile FROM evaluators as u where u.user_id = \`challenge_response\`.\`evaluated_by\` )`), 'mobile'
+                            ],
+                            [
+                                db.literal(`(SELECT username FROM users as u where u.user_id = \`challenge_response\`.\`evaluated_by\` )`), 'username'
+                            ],
+                            [
+                                db.literal(`(SELECT role FROM users as u where u.user_id = \`challenge_response\`.\`evaluated_by\` )`), 'role'
+                            ],
+                            [
+                                db.Sequelize.fn('count', db.Sequelize.col(`challenge_response.evaluated_by`)), 'evaluatedIdeaCount'
+                            ]
+                        ]
+                        response = await this.crudService.findAll(challenge_response, {
+                            attributes: attributesNeedFetch,
+                            where: { evaluated_by: { [Op.not]: null } },
+                            group: [`challenge_response.evaluated_by`]
+                        });
+                        if (response instanceof Error) {
+                            throw response
+                        }
+                        break;
+                    case 'L2':
+                        attributesNeedFetch = [
+                            [
+                                db.literal(`(SELECT full_name FROM users as u where u.user_id = \`evaluator_rating\`.\`evaluator_id\` )`), 'full_name'
+                            ],
+                            [
+                                db.literal(`(SELECT mobile FROM evaluators as u where u.user_id = \`evaluator_rating\`.\`evaluator_id\` )`), 'mobile'
+                            ],
+                            [
+                                db.literal(`(SELECT username FROM users as u where u.user_id = \`evaluator_rating\`.\`evaluator_id\` )`), 'username'
+                            ],
+                            [
+                                db.literal(`(SELECT role FROM users as u where u.user_id = \`evaluator_rating\`.\`evaluator_id\` )`), 'role'
+                            ],
+                            [
+                                db.Sequelize.fn('count', db.Sequelize.col(`evaluator_rating.evaluator_id`)), 'evaluatedIdeaCount'
+                            ]
+                        ]
+                        response = await this.crudService.findAll(evaluator_rating, {
+                            attributes: attributesNeedFetch,
+                            group: [`evaluator_rating.evaluator_id`],
+                        });
+                        if (response instanceof Error) {
+                            throw response
+                        }
+                        break;
+                    default:
+                        break;
+                }
+            }
+            return res.status(200).send(dispatcher(res, response, 'success'));
+        } catch (error) {
+            next(error);
+        }
     }
     protected async createData(req: Request, res: Response, next: NextFunction) {
         try {

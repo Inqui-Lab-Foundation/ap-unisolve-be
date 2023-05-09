@@ -20,10 +20,11 @@ import StudentService from '../services/students.service';
 import { badge } from '../models/badge.model';
 import { mentor } from '../models/mentor.model';
 import { organization } from '../models/organization.model';
-import { badRequest, internal, notFound } from 'boom';
-import { find } from 'lodash';
+import { badRequest, internal, notFound, unauthorized } from 'boom';
 import { string } from 'joi';
 import db from "../utils/dbconnection.util"
+import { quiz_survey_response } from '../models/quiz_survey_response.model';
+import { challenge_response } from '../models/challenge_response.model';
 
 export default class StudentController extends BaseController {
     model = "student";
@@ -52,6 +53,7 @@ export default class StudentController extends BaseController {
         this.router.post(`${this.path}/:student_user_id/badges`, this.addBadgeToStudent.bind(this));
         this.router.get(`${this.path}/:student_user_id/badges`, this.getStudentBadges.bind(this));
         this.router.get(`${this.path}/passwordUpdate`, this.studentPasswordUpdate.bind(this));
+        this.router.get(`${this.path}/downloadCertificate`, this.downloadCertificate.bind(this));
         super.initializeRoutes();
     }
     protected async getData(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
@@ -677,6 +679,169 @@ export default class StudentController extends BaseController {
                 throw updateCertificate;
             }
             return res.status(200).send(dispatcher(res, updateCertificate, 'Certificate Updated'));
+        } catch (error) {
+            next(error);
+        }
+    }
+    private async downloadCertificate(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+        try {
+            let user_id = res.locals.user_id
+            let condition = req.query.condition;
+            let district: any = req.query.district;
+            let districtFilter: any = {}
+            let response: any;
+            if (!user_id) {
+                throw unauthorized(speeches.UNAUTHORIZED_ACCESS)
+            }
+            if (!condition) {
+                throw unauthorized(speeches.LEVEL_REQUIRED)
+            }
+            if (condition && typeof condition == 'string') {
+                switch (condition) {
+                    case 'studentParticipation':
+                        if (district) {
+                            districtFilter["literal"] = district && typeof district == 'string' && district !== 'All Districts' ? db.literal('`team->mentor->organization`.`district` = ' + JSON.stringify(district)) : {}
+                        } else {
+                            districtFilter["literal"] = {}
+                        }
+                        response = await this.crudService.findAll(student, {
+                            attributes: [
+                                'full_name'
+                            ],
+                            where: {
+                                [Op.and]: [
+                                    db.literal('`team->challenge_responses`.`team_id` =' + `\`student\`.\`team_id\``),
+                                    districtFilter.literal
+                                ]
+                            },
+                            include: {
+                                model: team,
+                                attributes: ["team_id"],
+                                include: [
+                                    {
+                                        model: challenge_response,
+                                        attributes: ["challenge_response_id"],
+                                        required: true
+                                    },
+                                    {
+                                        model: mentor,
+                                        attributes: ["mentor_id"],
+                                        include: {
+                                            model: organization,
+                                            where: districtFilter.whereClause,
+                                            required: false,
+                                            attributes: [
+                                                "organization_name",
+                                                "district"
+                                            ],
+                                        }
+                                    }
+                                ]
+                            }
+                        });
+                        break;
+                    case 'studentCourseCompletion':
+                        if (district) {
+                            districtFilter["literal"] = district && typeof district == 'string' && district !== 'All Districts' ? db.literal('`team->mentor->organization`.`district` = ' + JSON.stringify(district)) : {}
+                        } else {
+                            districtFilter["literal"] = {}
+                        }
+                        response = await this.crudService.findAll(student, {
+                            attributes: [
+                                'full_name'
+                            ],
+                            where: {
+                                [Op.and]: [
+                                    db.literal('`user->quiz_survey_response`.`quiz_survey_id` = 4'),
+                                    districtFilter.literal
+                                ]
+                            },
+                            include: [
+                                {
+                                    model: user,
+                                    attributes: ["user_id"],
+                                    include: {
+                                        model: quiz_survey_response,
+                                        attributes: [],
+                                        required: true
+                                    }
+                                },
+                                {
+                                    model: team,
+                                    attributes: ["team_id"],
+                                    include: {
+                                        model: mentor,
+                                        attributes: ["mentor_id"],
+                                        include: {
+                                            model: organization,
+                                            required: true,
+                                            attributes: [
+                                                "organization_name",
+                                                "district"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ]
+                        });
+                        break;
+                    case 'mentorCourseCompletion':
+                        if (district) {
+                            districtFilter["literal"] = district && typeof district == 'string' && district !== 'All Districts' ? db.literal('`team->mentor->organization`.`district` = ' + JSON.stringify(district)) : {}
+                        } else {
+                            districtFilter["literal"] = {}
+                        }
+                        response = await this.crudService.findAll(mentor, {
+                            attributes: [
+                                'full_name'
+                            ],
+                            where: {
+                                [Op.and]: [
+                                    db.literal('`user->quiz_survey_response`.`quiz_survey_id` = 3'),
+                                    districtFilter.literal
+                                ]
+                            },
+                            include: [
+                                {
+                                    model: user,
+                                    attributes: ["user_id"],
+                                    include: {
+                                        model: quiz_survey_response,
+                                        attributes: [],
+                                        required: true
+                                    }
+                                },
+                                {
+                                    model: team,
+                                    attributes: ["team_id"],
+                                    include: {
+                                        model: mentor,
+                                        attributes: ["mentor_id"],
+                                        include: {
+                                            model: organization,
+                                            required: true,
+                                            attributes: [
+                                                "organization_name",
+                                                "district"
+                                            ]
+                                        }
+                                    }
+                                }
+                            ],
+                            group: [`mentor.mentor_id`]
+                        });
+                        break;
+                    default:
+                        break;
+                }
+            }
+            if (response instanceof Error) {
+                throw response
+            }
+            if (!response) {
+                throw notFound();
+            };
+            return res.status(200).send(dispatcher(res, response, 'success'));
         } catch (error) {
             next(error);
         }
